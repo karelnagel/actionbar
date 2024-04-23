@@ -1,8 +1,3 @@
 ---
-import { getLocaleUrl } from "@actionbar/shared/helpers";
 
-export const prerender = false;
-const url = getLocaleUrl(Astro.locals.locale);
-if (url === "idkwhyastrothinksthaturlisnotused") return;
-return Astro.redirect(url);
 ---

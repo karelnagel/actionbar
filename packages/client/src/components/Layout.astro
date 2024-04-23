@@ -5,30 +5,24 @@ import "../globals.css";
 import Footer from "./Footer.astro";
 import Header from "./Header.astro";
 import { SEO } from "astro-seo";
-import { Locale } from "@actionbar/i18n";
-import { getLocaleUrl, getPathname } from "@actionbar/shared/helpers";
 
 type Props = {
   title: string | undefined;
   description: string | undefined;
 };
-const { title, description = Astro.locals.t.description } = Astro.props;
+const { title, description } = Astro.props;
 
 const POSTHOG_API_KEY = import.meta.env.POSTHOG_API_KEY;
 ---
 
 <!doctype html>
-<html lang={Astro.locals.locale}>
+<html lang="en">
   <head>
     <SEO
       title={title}
-      titleTemplate=`%s - ${Astro.locals.t.name}`
+      titleTemplate=`%s - ActionBar`
       description={description}
-      titleDefault={Astro.locals.t.title}
-      languageAlternates={Locale.options.map((locale) => ({
-        href: getLocaleUrl(locale, getPathname(Astro.url.pathname)),
-        hrefLang: locale,
-      }))}
+      titleDefault="ActionBar"
       canonical={Astro.url.pathname}
       charset="UTF-8"
     />
