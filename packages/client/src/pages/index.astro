@@ -1,3 +1,12 @@
 ---
-
+import Layout from "../components/Layout.astro";
+import { ActionBarButton } from "../components/action-bar/Button";
 ---
+
+<Layout title={undefined} description={undefined}>
+  <div class="flex items-center justify-center py-10">
+    <ActionBarButton className="bg-blue-500 rounded-md p-2 text-white" client:load>
+      Open Bar
+    </ActionBarButton>
+  </div>
+</Layout>
