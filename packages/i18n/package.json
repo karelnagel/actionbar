@@ -1,5 +1,5 @@
 {
-  "name": "@template/i18n",
+  "name": "@actionbar/i18n",
   "version": "1.0.0",
   "main": "index.ts",
   "license": "MIT",

@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
-import { Locale } from "@template/i18n";
+import { Locale } from "@actionbar/i18n";
 import { SITE } from "./consts";
 
 export const getRandomId = () => uuidv4();

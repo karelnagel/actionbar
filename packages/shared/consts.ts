@@ -1,4 +1,4 @@
-export const DOMAIN = "template.com";
+export const DOMAIN = "actionbar.com";
 export const SITE = `https://${DOMAIN}`;
 
 export const EMAIL = `info@${DOMAIN}`;

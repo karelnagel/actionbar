@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { client, useAPI } from "../trpc/client";
-import { Locale } from "@template/i18n";
+import { Locale } from "@actionbar/i18n";
 
 export const ContactForm = ({ locale }: { locale: Locale }) => {
   const [name, setName] = useState("");

@@ -4,10 +4,10 @@ import mdx from "@astrojs/mdx";
 import react from "@astrojs/react";
 import aws from "astro-sst";
 import basicSsl from "@vitejs/plugin-basic-ssl";
-import { DEFAULT_LOCALE, Locale } from "@template/i18n";
+import { DEFAULT_LOCALE, Locale } from "@actionbar/i18n";
 import robotsTxt from "astro-robots-txt";
 import sitemap from "@astrojs/sitemap";
-import { SITE } from "@template/shared/consts";
+import { SITE } from "@actionbar/shared/consts";
 
 export default defineConfig({
   output: "hybrid",

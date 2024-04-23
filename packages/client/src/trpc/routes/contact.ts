@@ -1,8 +1,8 @@
 import { z } from "zod";
 import { publicProcedure, root } from "../root";
-import { Locale, useTranslations } from "@template/i18n";
-// import { sendEmail } from "@template/shared/email";
-// import { EMAIL } from "@template/shared/consts";
+import { Locale, useTranslations } from "@actionbar/i18n";
+// import { sendEmail } from "@actionbar/shared/email";
+// import { EMAIL } from "@actionbar/shared/consts";
 
 export const contact = root.router({
   contact: publicProcedure

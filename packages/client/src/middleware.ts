@@ -1,6 +1,6 @@
 import { defineMiddleware } from "astro:middleware";
-import { Locale, DEFAULT_LOCALE, useTranslations } from "@template/i18n";
-import { getLocaleUrl } from "@template/shared/helpers";
+import { Locale, DEFAULT_LOCALE, useTranslations } from "@actionbar/i18n";
+import { getLocaleUrl } from "@actionbar/shared/helpers";
 
 const SKIP = ["/_astro", "/_image"];
 

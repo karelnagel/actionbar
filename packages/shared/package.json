@@ -1,5 +1,5 @@
 {
-  "name": "@template/shared",
+  "name": "@actionbar/shared",
   "version": "1.0.0",
   "main": "src/index.ts",
   "license": "MIT",

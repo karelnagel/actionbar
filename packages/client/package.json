@@ -1,5 +1,5 @@
 {
-  "name": "@template/client",
+  "name": "@actionbar/client",
   "type": "module",
   "version": "0.0.1",
   "scripts": {
@@ -17,8 +17,8 @@
     "@fontsource-variable/inter": "^5.0.17",
     "@fontsource-variable/montserrat": "^5.0.18",
     "@tailwindcss/typography": "^0.5.10",
-    "@template/i18n": "*",
-    "@template/shared": "*",
+    "@actionbar/i18n": "*",
+    "@actionbar/shared": "*",
     "@trpc/client": "^10.45.2",
     "@trpc/server": "^10.45.2",
     "@types/react": "18.0.26",

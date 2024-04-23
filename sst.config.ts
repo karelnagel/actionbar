@@ -3,7 +3,7 @@
 
 export default $config({
   app: () => ({
-    name: "template",
+    name: "actionbar",
     home: "aws",
     removal: "remove",
     providers: { aws: { region: "eu-central-1" } },
