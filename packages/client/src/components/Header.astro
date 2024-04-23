@@ -1,0 +1,17 @@
+---
+import { Locale, LocaleInfo } from "@template/i18n";
+import { getLocaleUrl } from "@template/shared/helpers";
+import { getPathname } from "@template/shared/helpers";
+
+const pathname = getPathname(Astro.url.pathname);
+---
+
+<div>
+  {
+    Locale.options.map((locale) => (
+      <a class="button" href={getLocaleUrl(locale, pathname)}>
+        {LocaleInfo[locale].title}
+      </a>
+    ))
+  }
+</div>

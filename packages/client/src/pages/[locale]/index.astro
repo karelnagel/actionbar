@@ -1,0 +1,13 @@
+---
+import type { GetStaticPaths } from "astro";
+import Layout from "../../components/Layout.astro";
+import { LocalePaths } from "@template/i18n";
+import { ContactForm } from "../../components/Contact";
+
+export const getStaticPaths: GetStaticPaths = () => LocalePaths;
+---
+
+<Layout title={undefined} description={undefined}>
+  <p>{Astro.locals.t.title}</p>
+  <ContactForm locale={Astro.locals.locale} client:load />
+</Layout>

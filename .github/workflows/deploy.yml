@@ -1,0 +1,40 @@
+name: Deploy
+
+env:
+  ASTRO_STUDIO_APP_TOKEN: ${{secrets.ASTRO_STUDIO_APP_TOKEN }}
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+on:
+  push:
+    branches:
+      - dev
+      - main
+
+jobs:
+  deploy:
+    permissions:
+      contents: read
+      actions: read
+      pull-requests: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: jaid/action-npm-install@v1.2.1
+      - uses: withastro/action-studio@main
+      - run: npm i @libsql/linux-x64-gnu
+
+      # - name: Typecheck
+      #   run: npm run check
+
+      - name: Set up environment variables
+        run: echo "STAGE=${{ github.ref_name }}" >> $GITHUB_ENV
+
+      - name: Install SST
+        run: curl -fsSL https://ion.sst.dev/install | bash
+
+      - name: Deploy SST app
+        run: /home/runner/.sst/bin/sst deploy --stage=$STAGE

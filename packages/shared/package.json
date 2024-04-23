@@ -1,0 +1,11 @@
+{
+  "name": "@template/shared",
+  "version": "1.0.0",
+  "main": "src/index.ts",
+  "license": "MIT",
+  "dependencies": {
+    "@aws-sdk/client-ses": "^3.540.0",
+    "@types/uuid": "^9.0.2",
+    "uuid": "^9.0.0"
+  }
+}

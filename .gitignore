@@ -1,0 +1,24 @@
+# dependencies
+node_modules
+
+.build
+
+# opennext
+.open-next
+
+# misc
+.DS_Store
+
+# local env files
+.env*.local
+.env
+
+# SST
+.sst/*
+.obsidian/*
+
+# IDE
+.vscode
+
+playwright-report/
+test-results/

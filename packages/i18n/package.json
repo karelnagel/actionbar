@@ -1,0 +1,9 @@
+{
+  "name": "@template/i18n",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "license": "MIT",
+  "dependencies": {
+    "zod": "^3.22.2"
+  }
+}

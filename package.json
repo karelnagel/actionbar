@@ -1,0 +1,26 @@
+{
+  "name": "template",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "format": "prettier --write .",
+    "dev": "cd packages/client && npm run dev",
+    "test": "playwright test",
+    "testgen": "playwright codegen",
+    "build": "cd packages/client && npm run build",
+    "check": "tsc --noEmit && cd packages/client && astro check"
+  },
+  "dependencies": {
+    "prettier-plugin-astro": "^0.13.0",
+    "prettier-plugin-tailwindcss": "^0.5.12"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.42.1",
+    "prettier": "^3.2.5",
+    "typescript": "^5.3.2"
+  }
+}
