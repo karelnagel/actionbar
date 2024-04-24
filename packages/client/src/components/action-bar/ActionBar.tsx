@@ -1,9 +1,9 @@
 import { Fragment, ReactNode, useEffect, useRef } from "react";
 import { useStore } from "@nanostores/react";
-import { actionBarOpen, actionBarSearch, actionBarVisibleSections } from "./state";
+import { actionBarElements, actionBarOpen, actionBarSearch } from "./state";
 import { Loader2 } from "lucide-react";
 import { CheckIfSomeItemIsSelected, FilterSections, OpenCloseKeys, UpDownKeys } from "./hooks";
-import { ActionBarSectionsInput, ActionBarItem, ActionBarElement } from "./types";
+import { ActionBarSectionsInput, ActionBarItem } from "./types";
 import { ArrowUpRight } from "lucide-react";
 import { useCallback } from "react";
 import { actionBarSelectedId } from "./state";
@@ -74,14 +74,8 @@ const Top = () => {
 };
 
 const Bottom = () => {
-  const visibleSections = useStore(actionBarVisibleSections);
+  const elements = useStore(actionBarElements);
 
-  const elements: ActionBarElement[] = Object.values(visibleSections)
-    .filter((section) => section.items.length)
-    .flatMap((section) => [
-      { type: "section", title: section.title, loading: section.loadingDate !== null },
-      ...(section.items.map((item) => ({ type: "item" as const, item })) || []),
-    ]);
   return (
     <div className="flex h-full flex-col overflow-y-auto p-3">
       {elements.map((e) => {

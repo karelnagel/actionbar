@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import {
+  actionBarItems,
   actionBarOpen,
   actionBarSearch,
   actionBarSelectedId,
@@ -31,7 +32,7 @@ const handleUpDown = (e: any) => {
   if (!open) return;
 
   const selectedId = actionBarSelectedId.get();
-  const allItems = Object.values(actionBarVisibleSections.get()).flatMap((s) => s.items);
+  const allItems = actionBarItems.get();
   const selectedIndex = allItems.findIndex((i) => i.id === selectedId);
 
   let id;
@@ -59,12 +60,11 @@ export const UpDownKeys = () => {
 
 export const CheckIfSomeItemIsSelected = () => {
   const selectedId = useStore(actionBarSelectedId);
-  const visibleSections = useStore(actionBarVisibleSections);
+  const allItems = useStore(actionBarItems);
   useEffect(() => {
-    const allItems = Object.values(visibleSections).flatMap((s) => s.items);
     const selected = allItems.some((i) => i.id === selectedId);
     if (!selected) actionBarSelectedId.set(allItems[0]?.id || null);
-  }, [selectedId, visibleSections]);
+  }, [selectedId, allItems]);
   return null;
 };
 
