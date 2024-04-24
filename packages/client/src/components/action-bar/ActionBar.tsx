@@ -3,48 +3,19 @@ import { useStore } from "@nanostores/react";
 import {
   actionBarOpen,
   actionBarSearch,
-  actionBarSelectedIndex,
+  actionBarSelectedId,
   actionBarVisibleSections,
 } from "./state";
 import { ArrowUpRight, Loader2, LucideIcon } from "lucide-react";
+import { CheckIfSomeItemIsSelected, OpenCloseKeys, UpDownKeys } from "./hooks";
 
-export const useKeyboardShortcuts = () => {
-  useEffect(() => {
-    const down = (e: any) => {
-      const open = actionBarOpen.get();
-      const index = actionBarSelectedIndex.get();
-      const visibleSections = actionBarVisibleSections.get();
-      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
-        e.preventDefault();
-        actionBarOpen.set(!open);
-      }
-      if (open && e.key === "Escape") {
-        e.preventDefault();
-        actionBarOpen.set(false);
-      }
-      if (open && e.key === "ArrowUp") {
-        e.preventDefault();
-        actionBarSelectedIndex.set(Math.max(0, index - 1));
-      }
-      if (open && e.key === "ArrowDown") {
-        e.preventDefault();
-        actionBarSelectedIndex.set(
-          Math.min(Object.values(visibleSections).flatMap((s) => s.items).length - 1, index + 1),
-        );
-      }
-    };
-
-    document.addEventListener("keydown", down);
-    return () => document.removeEventListener("keydown", down);
-  }, []);
-};
 export type ActionBarSectionsInput = Record<string, ActionBarSectionInput>;
 export type ActionBarSectionInput = {
   title: string;
 } & (
   | {
       type: "static";
-      items: ActionBarItem[];
+      items: ActionBarItemInput[];
     }
   // | {
   //     type: "fetch-on-load";
@@ -53,13 +24,24 @@ export type ActionBarSectionInput = {
   | {
       type: "fetch-on-search";
       debounce?: number;
-      items: (search: string) => Promise<ActionBarItem[]>;
+      items: (search: string) => Promise<ActionBarItemInput[]>;
     }
 );
+
+export type ActionBarItemInput = {
+  title: string;
+  href?: string;
+  Icon?: LucideIcon;
+  cta?: string;
+  id?: string;
+  action?: (() => void) | (() => Promise<void>);
+  // actionArgs?
+};
+
 export type ActionBarSections = Record<string, ActionBarSection>;
 export type ActionBarSection = {
   title: string;
-  items?: ActionBarItem[];
+  items: ActionBarItem[];
   loadingDate: Date | null;
 };
 
@@ -68,8 +50,8 @@ export type ActionBarItem = {
   href?: string;
   Icon?: LucideIcon;
   cta?: string;
+  id: string;
   action?: (() => void) | (() => Promise<void>);
-  // actionArgs?
 };
 
 const compare = (a: string, b: string) => a.toLowerCase().includes(b.toLowerCase());
@@ -94,8 +76,12 @@ const filterSections = async (sections: ActionBarSectionsInput, search: string) 
     }
     const oldSection = actionBarVisibleSections.get()[key];
     // To prevent the loading indicator from hiding when one fn finishes but it isn't the last one
-    if ((items && !oldSection?.loadingDate) || oldSection?.loadingDate === loadingDate) {
-      actionBarVisibleSections.setKey(key, { ...section, items, loadingDate: null });
+    if (items && (!oldSection?.loadingDate || oldSection?.loadingDate === loadingDate)) {
+      actionBarVisibleSections.setKey(key, {
+        ...section,
+        items: items.map((item, i) => ({ ...item, id: item.id || `${key}-${i}` })),
+        loadingDate: null,
+      });
     }
   });
 
@@ -107,17 +93,14 @@ type ActionBarProps = { sections: ActionBarSectionsInput };
 export const ActionBar = ({ sections }: ActionBarProps) => {
   const open = useStore(actionBarOpen);
   const search = useStore(actionBarSearch);
-  const selectedIndex = useStore(actionBarSelectedIndex);
   const visibleSections = useStore(actionBarVisibleSections);
   const inputRef = useRef<HTMLInputElement>(null);
-
-  useKeyboardShortcuts();
 
   useEffect(() => inputRef.current?.focus(), [open]);
   useEffect(() => {
     filterSections(sections, search);
   }, [sections, search]);
-
+  console.log(visibleSections);
   return (
     <div
       style={{ colorScheme: "dark" }}
@@ -126,6 +109,9 @@ export const ActionBar = ({ sections }: ActionBarProps) => {
       }`}
       onClick={() => actionBarOpen.set(false)}
     >
+      <UpDownKeys />
+      <OpenCloseKeys />
+      <CheckIfSomeItemIsSelected />
       <div
         className="flex h-full max-h-[380px] w-full max-w-[700px] flex-col overflow-hidden rounded-2xl border border-white/15 bg-[#121212] text-white"
         onClick={(e) => e.stopPropagation()}
@@ -150,9 +136,7 @@ export const ActionBar = ({ sections }: ActionBarProps) => {
                   <p>{section.title}</p>
                   {section.loadingDate && <Loader2 className="h-3 w-3 animate-spin" />}
                 </div>
-                {section.items?.map((item, i) => (
-                  <Item selected={selectedIndex === i} key={i} item={item} index={i} />
-                ))}
+                {section.items?.map((item, i) => <Item key={i} item={item} />)}
               </Fragment>
             ))}
         </div>
@@ -163,11 +147,12 @@ export const ActionBar = ({ sections }: ActionBarProps) => {
 
 type ItemProps = {
   item: ActionBarItem;
-  selected: boolean;
-  index: number;
 };
 
-const Item = ({ item, selected, index }: ItemProps) => {
+const Item = ({ item }: ItemProps) => {
+  const selectedId = useStore(actionBarSelectedId);
+  const selected = selectedId === item.id;
+  const ref = useRef<HTMLDivElement>(null);
   const action = () => {
     if (item.action) item.action();
     if (item.href) window.location.href = item.href;
@@ -180,11 +165,16 @@ const Item = ({ item, selected, index }: ItemProps) => {
     document.addEventListener("keydown", listenToEnter);
     return () => document.removeEventListener("keydown", listenToEnter);
   }, []);
+  useEffect(() => {
+    if (selected)
+      ref.current?.scrollIntoView({ behavior: "smooth", inline: "nearest", block: "center" });
+  }, [selected]);
   const Icon = item.Icon || ArrowUpRight;
   return (
-    <button
-      onMouseEnter={() => actionBarSelectedIndex.set(index)}
-      className={`${selected ? "bg-white/10 text-white" : "text-white/70"} flex items-center gap-2 rounded-md p-2 text-[15px] duration-150`}
+    <div
+      ref={ref}
+      onMouseEnter={() => actionBarSelectedId.set(item.id)}
+      className={`${selected ? "bg-white/10 text-white" : "text-white/70"} flex cursor-pointer items-center gap-2 rounded-md p-2 text-[15px] duration-150`}
       onClick={action}
     >
       <Icon className={`h-5 w-5 rounded-md `} />
@@ -194,6 +184,6 @@ const Item = ({ item, selected, index }: ItemProps) => {
       >
         {item.cta || "Go to"}
       </span>
-    </button>
+    </div>
   );
 };

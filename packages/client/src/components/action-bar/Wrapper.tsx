@@ -10,6 +10,13 @@ const SECTIONS: ActionBarSectionsInput = {
       { title: "Dogs", href: "/dogs" },
       { title: "Rats", href: "/rats" },
       { title: "Bats", href: "/bats" },
+      { title: "Cows", href: "/cows" },
+      { title: "Sheep", href: "/sheep" },
+      { title: "Pigs", href: "/pigs" },
+      { title: "Horses", href: "/horses" },
+      { title: "Bears", href: "/bears" },
+      { title: "Monkeys", href: "/monkeys" },
+      { title: "Snail", href: "/snail" },
     ],
   },
   actions: {
