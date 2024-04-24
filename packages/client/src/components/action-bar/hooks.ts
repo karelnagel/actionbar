@@ -5,7 +5,7 @@ import { useStore } from "@nanostores/react";
 const handleOpenCloseKeys = (e: any) => {
   if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
     e.preventDefault();
-    actionBarOpen.set(!open);
+    actionBarOpen.set(!actionBarOpen.get());
   }
   if (e.key === "Escape" && actionBarOpen.get()) {
     e.preventDefault();
