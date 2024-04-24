@@ -5,7 +5,7 @@ import "../globals.css";
 import Footer from "./Footer.astro";
 import Header from "./Header.astro";
 import { SEO } from "astro-seo";
-import { ActionBar } from "./action-bar/ActionBar";
+import { ActionBarWrapper } from "./action-bar/Wrapper";
 
 type Props = {
   title: string | undefined;
@@ -32,6 +32,6 @@ const { title, description } = Astro.props;
       <slot />
     </div>
     <Footer />
-    <ActionBar client:load />
+    <ActionBarWrapper client:load />
   </body>
 </html>
