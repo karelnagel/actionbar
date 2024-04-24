@@ -17,10 +17,16 @@ export const useKeyboardShortcuts = () => {
       if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
         actionBarOpen.set(!open);
-      } else if (e.key === "ArrowUp") {
+      }
+      if (open && e.key === "Escape") {
+        e.preventDefault();
+        actionBarOpen.set(false);
+      }
+      if (open && e.key === "ArrowUp") {
         e.preventDefault();
         actionBarSelectedIndex.set(Math.max(0, index - 1));
-      } else if (e.key === "ArrowDown") {
+      }
+      if (open && e.key === "ArrowDown") {
         e.preventDefault();
         actionBarSelectedIndex.set(
           Math.min(Object.values(visibleSections).flatMap((s) => s.items).length - 1, index + 1),
