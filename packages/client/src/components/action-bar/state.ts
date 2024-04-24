@@ -1,5 +1,5 @@
 import { atom, map } from "nanostores";
-import { ActionBarSections } from "./ActionBar";
+import { ActionBarSections } from "./types";
 
 export const actionBarOpen = atom(true);
 export const actionBarSearch = atom("");

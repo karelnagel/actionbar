@@ -1,58 +1,10 @@
-import { Fragment, useCallback, useEffect, useRef } from "react";
+import { Fragment, useEffect, useRef } from "react";
 import { useStore } from "@nanostores/react";
-import {
-  actionBarOpen,
-  actionBarSearch,
-  actionBarSelectedId,
-  actionBarVisibleSections,
-} from "./state";
-import { ArrowUpRight, Loader2, LucideIcon } from "lucide-react";
+import { actionBarOpen, actionBarSearch, actionBarVisibleSections } from "./state";
+import { Loader2 } from "lucide-react";
 import { CheckIfSomeItemIsSelected, OpenCloseKeys, UpDownKeys } from "./hooks";
-
-export type ActionBarSectionsInput = Record<string, ActionBarSectionInput>;
-export type ActionBarSectionInput = {
-  title: string;
-} & (
-  | {
-      type: "static";
-      items: ActionBarItemInput[];
-    }
-  // | {
-  //     type: "fetch-on-load";
-  //     items: () => Promise<ActionBarItem[]>;
-  //   }
-  | {
-      type: "fetch-on-search";
-      debounce?: number;
-      items: (search: string) => Promise<ActionBarItemInput[]>;
-    }
-);
-
-export type ActionBarItemInput = {
-  title: string;
-  href?: string;
-  Icon?: LucideIcon;
-  cta?: string;
-  id?: string;
-  action?: (() => void) | (() => Promise<void>);
-  // actionArgs?
-};
-
-export type ActionBarSections = Record<string, ActionBarSection>;
-export type ActionBarSection = {
-  title: string;
-  items: ActionBarItem[];
-  loadingDate: Date | null;
-};
-
-export type ActionBarItem = {
-  title: string;
-  href?: string;
-  Icon?: LucideIcon;
-  cta?: string;
-  id: string;
-  action?: (() => void) | (() => Promise<void>);
-};
+import { ActionBarSectionsInput } from "./types";
+import { ActionBarItem } from "./ActionBarItem";
 
 const compare = (a: string, b: string) => a.toLowerCase().includes(b.toLowerCase());
 
@@ -88,7 +40,7 @@ const filterSections = async (sections: ActionBarSectionsInput, search: string) 
   await Promise.all(promises);
 };
 
-type ActionBarProps = { sections: ActionBarSectionsInput };
+export type ActionBarProps = { sections: ActionBarSectionsInput };
 
 export const ActionBar = ({ sections }: ActionBarProps) => {
   const open = useStore(actionBarOpen);
@@ -136,50 +88,11 @@ export const ActionBar = ({ sections }: ActionBarProps) => {
                   <p>{section.title}</p>
                   {section.loadingDate && <Loader2 className="h-3 w-3 animate-spin" />}
                 </div>
-                {section.items?.map((item, i) => <Item key={i} item={item} />)}
+                {section.items?.map((item, i) => <ActionBarItem key={i} item={item} />)}
               </Fragment>
             ))}
         </div>
       </div>
-    </div>
-  );
-};
-
-type ItemProps = {
-  item: ActionBarItem;
-};
-
-const Item = ({ item }: ItemProps) => {
-  const selectedId = useStore(actionBarSelectedId);
-  const selected = selectedId === item.id;
-  const action = useCallback(() => {
-    if (item.action) item.action();
-    if (item.href) window.location.href = item.href;
-  }, [item]);
-
-  useEffect(() => {
-    const listenToEnter = (e: any) => {
-      if (selected && actionBarOpen.get() && e.key === "Enter") action();
-    };
-    document.addEventListener("keydown", listenToEnter);
-    return () => document.removeEventListener("keydown", listenToEnter);
-  }, [selected, action]);
-
-  const Icon = item.Icon || ArrowUpRight;
-  return (
-    <div
-      id={item.id}
-      onMouseEnter={() => actionBarSelectedId.set(item.id)}
-      className={`${selected ? "bg-white/10 text-white" : "text-white/70"} flex cursor-pointer items-center gap-2 rounded-md p-2 text-[15px] duration-150`}
-      onClick={action}
-    >
-      <Icon className={`h-5 w-5 rounded-md `} />
-      <span>{item.title}</span>
-      <span
-        className={`${selected ? "opacity-60" : "opacity-0"} ml-auto rounded-md  p-1 text-xs duration-150`}
-      >
-        {item.cta || "Go to"}
-      </span>
     </div>
   );
 };

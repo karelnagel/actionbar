@@ -1,5 +1,6 @@
 import { FileIcon } from "lucide-react";
-import { ActionBar, ActionBarSectionsInput } from "./ActionBar";
+import { ActionBar } from "./ActionBar";
+import { ActionBarSectionsInput } from "./types";
 
 const SECTIONS: ActionBarSectionsInput = {
   pages: {
