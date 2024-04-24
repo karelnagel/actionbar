@@ -3,11 +3,11 @@ import {
   actionBarItems,
   actionBarOpen,
   actionBarSearch,
+  actionBarPanels,
   actionBarSelectedId,
   actionBarVisibleSections,
 } from "./state";
 import { useStore } from "@nanostores/react";
-import { ActionBarSectionsInput } from "./types";
 
 const handleOpenCloseKeys = (e: any) => {
   if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
@@ -68,16 +68,25 @@ export const CheckIfSomeItemIsSelected = () => {
   return null;
 };
 
-const compare = (a: string, b: string) => a.toLowerCase().includes(b.toLowerCase());
+export const compare = (a: string, b: string) => a.toLowerCase().includes(b.toLowerCase());
 
-export const FilterSections = ({ sections }: { sections: ActionBarSectionsInput }) => {
+export const FilterSections = () => {
+  const panels = useStore(actionBarPanels);
+
   const search = useStore(actionBarSearch);
   useEffect(() => {
+    const sections = panels[panels.length - 1]?.sections;
+    if (!sections) return;
+
     // Sets all the elements to loading
     const loadingDate = new Date();
-    Object.entries(actionBarVisibleSections.get()).forEach(([key, section]) => {
-      actionBarVisibleSections.setKey(key, { ...section, loadingDate });
-    });
+    actionBarVisibleSections.set({});
+    for (const [key, section] of Object.entries(sections)) {
+      actionBarVisibleSections.setKey(key, { ...section, items: [], loadingDate });
+    }
+    // Object.entries(actionBarVisibleSections.get()).forEach(([key, section]) => {
+    //   actionBarVisibleSections.setKey(key, { ...section, loadingDate });
+    // });
 
     const promises = Object.entries(sections).map(async ([key, section]) => {
       let items;
@@ -102,6 +111,6 @@ export const FilterSections = ({ sections }: { sections: ActionBarSectionsInput 
     });
 
     Promise.all(promises);
-  }, [search, sections]);
+  }, [search, panels]);
   return null;
 };

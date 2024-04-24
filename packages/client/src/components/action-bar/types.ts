@@ -1,6 +1,10 @@
 import type { LucideIcon } from "lucide-react";
 
-export type ActionBarSectionsInput = Record<string, ActionBarSectionInput>;
+export type ActionBarPanel = {
+  sections: Record<string, ActionBarSectionInput>;
+  placeholder: string;
+  name?: string;
+};
 export type ActionBarSectionInput = {
   title: string;
 } & (
@@ -20,14 +24,16 @@ export type ActionBarSectionInput = {
 );
 
 export type ActionBarItemInput = {
+  id?: string;
   title: string;
-  href?: string;
   Icon?: LucideIcon;
   cta?: string;
-  id?: string;
-  action?: (() => void) | (() => Promise<void>);
-  // actionArgs?
-};
+} & (
+  | {
+      action?: string | (() => void) | (() => Promise<void>);
+    }
+  | { panel: ActionBarPanel }
+);
 
 export type ActionBarSections = Record<string, ActionBarSection>;
 export type ActionBarSection = {
@@ -36,14 +42,7 @@ export type ActionBarSection = {
   loadingDate: Date | null;
 };
 
-export type ActionBarItem = {
-  title: string;
-  href?: string;
-  Icon?: LucideIcon;
-  cta?: string;
-  id: string;
-  action?: (() => void) | (() => Promise<void>);
-};
+export type ActionBarItem = ActionBarItemInput & { id: string };
 
 export type ActionBarElement =
   | { type: "section"; title: string; loading: boolean }

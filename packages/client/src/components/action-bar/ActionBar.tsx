@@ -1,22 +1,31 @@
 import { Fragment, ReactNode, useEffect, useRef } from "react";
 import { useStore } from "@nanostores/react";
-import { actionBarElements, actionBarOpen, actionBarSearch } from "./state";
+import {
+  actionBarElements,
+  actionBarOpen,
+  actionBarSearch,
+  actionBarPanels,
+  actionBarCurrentPanel,
+} from "./state";
 import { Loader2 } from "lucide-react";
 import { CheckIfSomeItemIsSelected, FilterSections, OpenCloseKeys, UpDownKeys } from "./hooks";
-import { ActionBarSectionsInput, ActionBarItem } from "./types";
+import { ActionBarPanel, ActionBarItem } from "./types";
 import { ArrowUpRight } from "lucide-react";
 import { useCallback } from "react";
 import { actionBarSelectedId } from "./state";
 
-export type ActionBarProps = { sections: ActionBarSectionsInput };
+export type ActionBarProps = { panel: ActionBarPanel };
 
-export const ActionBar = ({ sections }: ActionBarProps) => {
+export const ActionBar = ({ panel }: ActionBarProps) => {
+  useEffect(() => {
+    actionBarPanels.set([panel]);
+  }, []);
   return (
     <>
       <UpDownKeys />
       <OpenCloseKeys />
       <CheckIfSomeItemIsSelected />
-      <FilterSections sections={sections} />
+      <FilterSections />
       <Dialog>
         <Top />
         <div className="h-[1px] w-full bg-white/15"></div>
@@ -51,8 +60,10 @@ const Top = () => {
   const search = useStore(actionBarSearch);
   const open = useStore(actionBarOpen);
   const inputRef = useRef<HTMLInputElement>(null);
+  const panels = useStore(actionBarPanels);
+  const panel = useStore(actionBarCurrentPanel);
   useEffect(() => inputRef.current?.focus(), [open]);
-  const sections = ["Change theme"];
+  const sections = panels.map((panel) => panel.name).filter(Boolean);
   return (
     <div className="flex items-center gap-2 p-4 text-[18px]">
       {sections.map((section, i) => (
@@ -66,7 +77,7 @@ const Top = () => {
         type="text"
         className="placeholder:text-current/50 w-full bg-transparent focus:outline-none"
         value={search}
-        placeholder="What do you need?"
+        placeholder={panel?.placeholder}
         onChange={(e) => actionBarSearch.set(e.target.value)}
       />
     </div>
@@ -100,8 +111,14 @@ export const Item = ({ item }: { item: ActionBarItem }) => {
   const selectedId = useStore(actionBarSelectedId);
   const selected = selectedId === item.id;
   const action = useCallback(() => {
-    if (item.action) item.action();
-    if (item.href) window.location.href = item.href;
+    if ("action" in item) {
+      if (typeof item.action === "string") window.location.href = item.action;
+      if (typeof item.action === "function") item.action();
+    } else if ("panel" in item) {
+      actionBarPanels.set([...actionBarPanels.get(), item.panel]);
+      actionBarSearch.set("");
+    }
+    // Todo: if not action then it should go into the new sections
   }, [item]);
 
   useEffect(() => {
