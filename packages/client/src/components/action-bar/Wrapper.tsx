@@ -2,8 +2,8 @@ import { FileIcon } from "lucide-react";
 import { ActionBar, ActionBarSectionsInput } from "./ActionBar";
 
 const SECTIONS: ActionBarSectionsInput = {
-  blog: {
-    title: "Blog",
+  pages: {
+    title: "Pages",
     type: "static",
     items: [
       { title: "Cats", href: "/cats", Icon: FileIcon },
@@ -40,9 +40,10 @@ const SECTIONS: ActionBarSectionsInput = {
   search: {
     title: "Search",
     type: "fetch-on-search",
+    debounce: 2000,
     items: async (search: string) => {
       if (search.length < 2) return [];
-
+      console.log("this fn should only be executed at the end");
       await new Promise((resolve) => setTimeout(resolve, 2000));
       return [{ title: `Searched for ${search}, it has ${search.length} letters` }];
     },

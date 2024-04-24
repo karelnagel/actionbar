@@ -54,7 +54,7 @@ export type ActionBarSections = Record<string, ActionBarSection>;
 export type ActionBarSection = {
   title: string;
   items?: ActionBarItem[];
-  isLoading: boolean;
+  loadingDate: Date | null;
 };
 
 export type ActionBarItem = {
@@ -70,23 +70,27 @@ const compare = (a: string, b: string) => a.toLowerCase().includes(b.toLowerCase
 
 const filterSections = async (sections: ActionBarSectionsInput, search: string) => {
   // Sets all the elements to loading
+  const loadingDate = new Date();
   Object.entries(actionBarVisibleSections.get()).forEach(([key, section]) => {
-    actionBarVisibleSections.setKey(key, { ...section, isLoading: true });
+    actionBarVisibleSections.setKey(key, { ...section, loadingDate });
   });
 
   const promises = Object.entries(sections).map(async ([key, section]) => {
-    if (section.type === "static")
-      actionBarVisibleSections.setKey(key, {
-        ...section,
-        items: section.items.filter((i) => compare(i.title, search)),
-        isLoading: false,
-      });
-    else if (section.type === "fetch-on-search")
-      actionBarVisibleSections.setKey(key, {
-        ...section,
-        items: await section.items(search),
-        isLoading: false,
-      });
+    let items;
+    if (section.type === "static") {
+      items = section.items.filter((i) => compare(i.title, search));
+    } else if (section.type === "fetch-on-search") {
+      if (section.debounce) await new Promise((r) => setTimeout(r, section.debounce));
+      const currentSection = actionBarVisibleSections.get()[key];
+      if (!currentSection?.loadingDate || currentSection?.loadingDate === loadingDate) {
+        items = await section.items(search);
+      }
+    }
+    const oldSection = actionBarVisibleSections.get()[key];
+    // To prevent the loading indicator from hiding when one fn finishes but it isn't the last one
+    if ((items && !oldSection?.loadingDate) || oldSection?.loadingDate === loadingDate) {
+      actionBarVisibleSections.setKey(key, { ...section, items, loadingDate: null });
+    }
   });
 
   await Promise.all(promises);
@@ -111,13 +115,13 @@ export const ActionBar = ({ sections }: ActionBarProps) => {
   return (
     <div
       style={{ colorScheme: "dark" }}
-      className={`fixed left-0 top-0 h-full w-full items-start justify-center p-4 pt-[20%] duration-150 ${
+      className={`fixed left-0 top-0 h-screen w-screen items-start justify-center p-4 pt-[20vh] duration-150 ${
         open ? "flex bg-black/20" : "hidden"
       }`}
       onClick={() => actionBarOpen.set(false)}
     >
       <div
-        className="w-full max-w-[700px] rounded-2xl border border-white/15 bg-[#121212] text-white"
+        className="flex h-full max-h-[380px] w-full max-w-[700px] flex-col overflow-hidden rounded-2xl border border-white/15 bg-[#121212] text-white"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="p-4">
@@ -131,14 +135,14 @@ export const ActionBar = ({ sections }: ActionBarProps) => {
           />
         </div>
         <div className="h-[1px] w-full bg-white/15"></div>
-        <div className="flex max-h-[380px] flex-col overflow-y-scroll p-3">
+        <div className="flex h-full flex-col overflow-y-auto p-3">
           {Object.entries(visibleSections)
-            .filter(([_, section]) => section.isLoading || section.items?.length)
+            .filter(([_, section]) => section.loadingDate || section.items?.length)
             .map(([key, section]) => (
               <Fragment key={key}>
                 <div className="flex items-center gap-1 py-1 text-sm text-white/50">
                   <p>{section.title}</p>
-                  {section.isLoading && <Loader2 className="h-3 w-3 animate-spin" />}
+                  {section.loadingDate && <Loader2 className="h-3 w-3 animate-spin" />}
                 </div>
                 {section.items?.map((item, i) => (
                   <Item selected={selectedIndex === i} key={i} item={item} index={i} />
