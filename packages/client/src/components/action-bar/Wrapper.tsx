@@ -52,7 +52,14 @@ const SECTIONS: ActionBarSectionsInput = {
       if (search.length < 2) return [];
       console.log("this fn should only be executed at the end");
       await new Promise((resolve) => setTimeout(resolve, 2000));
-      return [{ title: `Searched for ${search}, it has ${search.length} letters` }];
+      return [
+        {
+          title: `Searched for ${search}, it has ${search.length} letters`,
+          action: () => {
+            alert(search);
+          },
+        },
+      ];
     },
   },
 };

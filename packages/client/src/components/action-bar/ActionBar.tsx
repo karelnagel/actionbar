@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useRef } from "react";
+import { Fragment, useCallback, useEffect, useRef } from "react";
 import { useStore } from "@nanostores/react";
 import {
   actionBarOpen,
@@ -152,27 +152,23 @@ type ItemProps = {
 const Item = ({ item }: ItemProps) => {
   const selectedId = useStore(actionBarSelectedId);
   const selected = selectedId === item.id;
-  const ref = useRef<HTMLDivElement>(null);
-  const action = () => {
+  const action = useCallback(() => {
     if (item.action) item.action();
     if (item.href) window.location.href = item.href;
-  };
+  }, [item]);
 
   useEffect(() => {
     const listenToEnter = (e: any) => {
-      if (actionBarOpen.get() && e.key === "Enter") action();
+      if (selected && actionBarOpen.get() && e.key === "Enter") action();
     };
     document.addEventListener("keydown", listenToEnter);
     return () => document.removeEventListener("keydown", listenToEnter);
-  }, []);
-  useEffect(() => {
-    if (selected)
-      ref.current?.scrollIntoView({ behavior: "smooth", inline: "nearest", block: "center" });
-  }, [selected]);
+  }, [selected, action]);
+
   const Icon = item.Icon || ArrowUpRight;
   return (
     <div
-      ref={ref}
+      id={item.id}
       onMouseEnter={() => actionBarSelectedId.set(item.id)}
       className={`${selected ? "bg-white/10 text-white" : "text-white/70"} flex cursor-pointer items-center gap-2 rounded-md p-2 text-[15px] duration-150`}
       onClick={action}

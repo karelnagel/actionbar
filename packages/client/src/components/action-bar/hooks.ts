@@ -28,16 +28,19 @@ const handleUpDown = (e: any) => {
   const allItems = Object.values(actionBarVisibleSections.get()).flatMap((s) => s.items);
   const selectedIndex = allItems.findIndex((i) => i.id === selectedId);
 
+  let id;
   if (e.key === "ArrowUp") {
-    e.preventDefault();
-    const id = allItems[Math.max(0, selectedIndex - 1)]?.id;
-    actionBarSelectedId.set(id || null);
-  }
-  if (e.key === "ArrowDown") {
-    e.preventDefault();
-    const id = allItems[Math.min(allItems.length - 1, selectedIndex + 1)]?.id;
-    actionBarSelectedId.set(id || null);
-  }
+    id = allItems[Math.max(0, selectedIndex - 1)]?.id;
+  } else if (e.key === "ArrowDown") {
+    id = allItems[Math.min(allItems.length - 1, selectedIndex + 1)]?.id;
+  } else return;
+
+  e.preventDefault();
+  actionBarSelectedId.set(id || null);
+  if (id)
+    document
+      .getElementById(id)
+      ?.scrollIntoView({ behavior: "smooth", block: "center", inline: "nearest" });
 };
 
 export const UpDownKeys = () => {
