@@ -44,3 +44,7 @@ export type ActionBarItem = {
   id: string;
   action?: (() => void) | (() => Promise<void>);
 };
+
+export type ActionBarElement =
+  | { type: "section"; title: string; loading: boolean }
+  | { type: "item"; item: ActionBarItem };

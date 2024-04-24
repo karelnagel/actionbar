@@ -1,6 +1,12 @@
 import { useEffect } from "react";
-import { actionBarOpen, actionBarSelectedId, actionBarVisibleSections } from "./state";
+import {
+  actionBarOpen,
+  actionBarSearch,
+  actionBarSelectedId,
+  actionBarVisibleSections,
+} from "./state";
 import { useStore } from "@nanostores/react";
+import { ActionBarSectionsInput } from "./types";
 
 const handleOpenCloseKeys = (e: any) => {
   if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
@@ -59,5 +65,43 @@ export const CheckIfSomeItemIsSelected = () => {
     const selected = allItems.some((i) => i.id === selectedId);
     if (!selected) actionBarSelectedId.set(allItems[0]?.id || null);
   }, [selectedId, visibleSections]);
+  return null;
+};
+
+const compare = (a: string, b: string) => a.toLowerCase().includes(b.toLowerCase());
+
+export const FilterSections = ({ sections }: { sections: ActionBarSectionsInput }) => {
+  const search = useStore(actionBarSearch);
+  useEffect(() => {
+    // Sets all the elements to loading
+    const loadingDate = new Date();
+    Object.entries(actionBarVisibleSections.get()).forEach(([key, section]) => {
+      actionBarVisibleSections.setKey(key, { ...section, loadingDate });
+    });
+
+    const promises = Object.entries(sections).map(async ([key, section]) => {
+      let items;
+      if (section.type === "static") {
+        items = section.items.filter((i) => compare(i.title, search));
+      } else if (section.type === "fetch-on-search") {
+        if (section.debounce) await new Promise((r) => setTimeout(r, section.debounce));
+        const currentSection = actionBarVisibleSections.get()[key];
+        if (!currentSection?.loadingDate || currentSection?.loadingDate === loadingDate) {
+          items = await section.items(search);
+        }
+      }
+      const oldSection = actionBarVisibleSections.get()[key];
+      // To prevent the loading indicator from hiding when one fn finishes but it isn't the last one
+      if (items && (!oldSection?.loadingDate || oldSection?.loadingDate === loadingDate)) {
+        actionBarVisibleSections.setKey(key, {
+          ...section,
+          items: items.map((item, i) => ({ ...item, id: item.id || `${key}-${i}` })),
+          loadingDate: null,
+        });
+      }
+    });
+
+    Promise.all(promises);
+  }, [search, sections]);
   return null;
 };
