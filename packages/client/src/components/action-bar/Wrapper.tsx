@@ -40,7 +40,7 @@ const SECTIONS: ActionBarSectionsInput = {
   search: {
     title: "Search",
     type: "fetch-on-search",
-    debounce: 2000,
+    debounce: 300,
     items: async (search: string) => {
       if (search.length < 2) return [];
       console.log("this fn should only be executed at the end");
