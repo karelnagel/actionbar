@@ -6,7 +6,7 @@ import {
   actionBarSelectedIndex,
   actionBarVisibleSections,
 } from "./state";
-import { ArrowUpRight, LucideIcon } from "lucide-react";
+import { ArrowUpRight, Loader2, LucideIcon } from "lucide-react";
 
 export const useKeyboardShortcuts = () => {
   useEffect(() => {
@@ -70,7 +70,7 @@ const compare = (a: string, b: string) => a.toLowerCase().includes(b.toLowerCase
 
 const filterSections = async (sections: ActionBarSectionsInput, search: string) => {
   // Sets all the elements to loading
-  Object.entries(actionBarVisibleSections).forEach(([key, section]) => {
+  Object.entries(actionBarVisibleSections.get()).forEach(([key, section]) => {
     actionBarVisibleSections.setKey(key, { ...section, isLoading: true });
   });
 
@@ -124,23 +124,22 @@ export const ActionBar = ({ sections }: ActionBarProps) => {
           <input
             ref={inputRef}
             type="text"
-            className="placeholder:text-current/50 bg-transparent text-[18px] focus:outline-none"
+            className="placeholder:text-current/50 w-full bg-transparent text-[18px] focus:outline-none"
             value={search}
             placeholder="What do you need?"
             onChange={(e) => actionBarSearch.set(e.target.value)}
           />
         </div>
         <div className="h-[1px] w-full bg-white/15"></div>
-        <div className="flex max-h-[380px] flex-col overflow-y-scroll p-2">
+        <div className="flex max-h-[380px] flex-col overflow-y-scroll p-3">
           {Object.entries(visibleSections)
-            .filter((x) => x[1].items?.length)
+            .filter(([_, section]) => section.isLoading || section.items?.length)
             .map(([key, section]) => (
               <Fragment key={key}>
-                <p className="py-1 text-sm text-white/50">{section.title}</p>
-                {section.isLoading ? "loading" : "notloading"}
-                {section.isLoading && (
-                  <div className="h-4 w-4 animate-pulse rounded-full bg-white/10" />
-                )}
+                <div className="flex items-center gap-1 py-1 text-sm text-white/50">
+                  <p>{section.title}</p>
+                  {section.isLoading && <Loader2 className="h-3 w-3 animate-spin" />}
+                </div>
                 {section.items?.map((item, i) => (
                   <Item selected={selectedIndex === i} key={i} item={item} index={i} />
                 ))}
