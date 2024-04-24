@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useStore } from "@nanostores/react";
 import { actionBarChatMode, actionBarOpen, actionBarSearch, actionBarSelectedIndex } from "./state";
 
@@ -13,7 +13,7 @@ export const useKeyboardShortcuts = () => {
       } else if (e.key === "ArrowUp") {
         e.preventDefault();
         actionBarSelectedIndex.set(Math.max(0, index - 1));
-      } else if ( e.key === "ArrowDown") {
+      } else if (e.key === "ArrowDown") {
         e.preventDefault();
         actionBarSelectedIndex.set(Math.min(POSTS.length - 1, index + 1));
       }
@@ -90,8 +90,13 @@ export const ActionBar = ({ hideSections }: ActionBarProps) => {
   const open = useStore(actionBarOpen);
   const search = useStore(actionBarSearch);
   const selectedIndex = useStore(actionBarSelectedIndex);
+  const inputRef = useRef<HTMLInputElement>(null);
+
   useKeyboardShortcuts();
 
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, [open]);
   useEffect(() => {
     console.log(actionBarSelectedIndex.get());
   }, [actionBarSelectedIndex]);
@@ -102,7 +107,12 @@ export const ActionBar = ({ hideSections }: ActionBarProps) => {
       onClick={() => actionBarOpen.set(false)}
     >
       <div className="rounded-md bg-blue-300 p-10 " onClick={(e) => e.stopPropagation()}>
-        <input type="text" value={search} onChange={(e) => actionBarSearch.set(e.target.value)} />
+        <input
+          ref={inputRef}
+          type="text"
+          value={search}
+          onChange={(e) => actionBarSearch.set(e.target.value)}
+        />
         <div className="flex flex-col">
           {SECTIONS.map((section) => (
             <div key={section.title}>
