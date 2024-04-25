@@ -34,6 +34,7 @@ export const ActionBar = ({ panel, style }: ActionBarProps) => {
     </>
   );
 };
+
 const Divider = () => {
   const s = useActionBarStyle();
   return <div style={{ backgroundColor: s.borderColor }} className="h-[1px] w-full"></div>;
@@ -61,8 +62,9 @@ const Dialog = ({ children }: { children: ReactNode }) => {
           color: s.textColor,
           borderColor: s.borderColor,
           borderRadius: 16 * s.roundness,
+          height: s.fullHeight ? "100%" : undefined,
         }}
-        className="flex h-full w-full flex-col overflow-hidden border"
+        className="flex w-full flex-col overflow-hidden border"
         onClick={(e) => e.stopPropagation()}
       >
         {children}

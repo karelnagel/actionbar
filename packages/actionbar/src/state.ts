@@ -14,12 +14,13 @@ export const actionBarStyle = atom<ActionBarStyle>({
   shadowColor: col("#121212", 0.2),
   borderColor: col("#FFFFFF", 0.15),
   textColor: "#FFFFFF",
-  maxHeight: 400,
+  maxHeight: 450,
   maxWidth: 700,
   colorScheme: "dark",
   paddingTop: 20,
   roundness: 1,
   hideBottom: false,
+  fullHeight: false,
 });
 export const useActionBarStyle = () => useStore(actionBarStyle);
 

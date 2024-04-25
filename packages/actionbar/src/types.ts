@@ -11,6 +11,7 @@ export type ActionBarStyle = {
   paddingTop: number;
   roundness: number;
   hideBottom: boolean;
+  fullHeight: boolean;
 };
 
 export type ActionBarProps = { panel: ActionBarPanel; style?: Partial<ActionBarStyle> };

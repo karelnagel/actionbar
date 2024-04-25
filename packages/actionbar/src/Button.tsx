@@ -11,8 +11,12 @@ export const ActionBarButton = ({
   style?: CSSProperties;
 }) => {
   return (
-    <button onClick={() => actionBarOpen.set(true)} className={className} style={style}>
+    <div
+      onClick={() => actionBarOpen.set(true)}
+      className={`cursor-pointer ${className}`}
+      style={style}
+    >
       {children}
-    </button>
+    </div>
   );
 };
