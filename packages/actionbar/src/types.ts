@@ -1,52 +1,46 @@
 import { ReactNode } from "react";
 
 export type ActionBarPanel = {
-  sections: Record<string, ActionBarSectionInput>;
+  sections: Record<string, ActionBarSection>;
   placeholder: string;
   name?: string;
 };
-export type ActionBarSectionInput = {
+export type ActionBarSection = {
   title?: string;
 } & (
   | {
       type: "static";
-      items: ActionBarItemInput[];
+      items: ActionBarItem[];
     }
-  // | {
-  //     type: "fetch-on-load";
-  //     items: () => Promise<ActionBarItem[]>;
-  //   }
   | {
       type: "fetch-on-search";
       debounce?: number;
-      items: (search: string) => Promise<ActionBarItemInput[]>;
+      items: (search: string) => Promise<ActionBarItem[]>;
     }
 );
 
 type ActionArgs = { search: string };
 
-export type ActionBarItemInput = {
+export type ActionBarItem = {
   id?: string;
   title: string;
   icon?: ReactNode;
   matchAll?: boolean;
   disabled?: boolean;
 } & (
-  | {
-      action?: string | ((a: ActionArgs) => void) | ((a: ActionArgs) => Promise<void>);
-    }
+  | { action?: string | ((a: ActionArgs) => void) | ((a: ActionArgs) => Promise<void>) }
   | { panel: ActionBarPanel }
 );
 
-export type ActionBarSections = Record<string, ActionBarSection>;
-export type ActionBarSection = {
+// Internal
+export type ActionBarInternalSection = {
   title?: string;
-  items: ActionBarItem[];
+  items: ActionBarInternalItem[];
   loadingDate: Date | null;
 };
 
-export type ActionBarItem = ActionBarItemInput & { id: string };
+export type ActionBarInternalItem = ActionBarItem & { id: string };
 
-export type ActionBarElement =
+export type ActionBarInternalElement =
   | { type: "section"; title?: string; loading: boolean }
-  | { type: "item"; item: ActionBarItem };
+  | { type: "item"; item: ActionBarInternalItem };

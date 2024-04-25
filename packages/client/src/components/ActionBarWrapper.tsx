@@ -154,7 +154,7 @@ const PANEL: ActionBarPanel = {
           icon: <MailIcon />,
           panel: {
             name: "Contact",
-            placeholder: "Type your email?",
+            placeholder: "Type your email",
             sections: {
               options: {
                 type: "fetch-on-search",

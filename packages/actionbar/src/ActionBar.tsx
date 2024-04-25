@@ -9,7 +9,7 @@ import {
 } from "./state";
 import { Loader2 } from "lucide-react";
 import { CheckIfSomeItemIsSelected, FilterSections, OpenCloseKeys, UpDownKeys } from "./hooks";
-import { ActionBarPanel, ActionBarItem } from "./types";
+import { ActionBarPanel, ActionBarInternalItem } from "./types";
 import { ArrowUpRight } from "lucide-react";
 import { useCallback } from "react";
 import { actionBarSelectedId } from "./state";
@@ -113,7 +113,7 @@ const Section = ({ title, loading }: { title: string; loading: boolean }) => {
   );
 };
 
-export const Item = ({ item }: { item: ActionBarItem }) => {
+export const Item = ({ item }: { item: ActionBarInternalItem }) => {
   const selectedId = useStore(actionBarSelectedId);
   const selected = selectedId === item.id;
 

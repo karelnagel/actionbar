@@ -1,5 +1,5 @@
 import { atom, computed, map } from "nanostores";
-import { ActionBarElement, ActionBarSections, ActionBarPanel } from "./types";
+import { ActionBarInternalElement, ActionBarPanel, ActionBarInternalSection } from "./types";
 
 export const actionBarOpen = atom(true);
 export const actionBarSearch = atom("");
@@ -17,10 +17,10 @@ actionBarOpen.listen(() => {
   actionBarSearch.set("");
 });
 
-export const actionBarVisibleSections = map<ActionBarSections>({});
+export const actionBarVisibleSections = map<Record<string, ActionBarInternalSection>>({});
 
 export const actionBarElements = computed(actionBarVisibleSections, (sections) => {
-  const elements: ActionBarElement[] = Object.values(sections)
+  const elements: ActionBarInternalElement[] = Object.values(sections)
     .filter((section) => section.loadingDate !== null || section.items.length)
     .flatMap((section) => [
       { type: "section", title: section.title, loading: section.loadingDate !== null },
