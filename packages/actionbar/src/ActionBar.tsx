@@ -8,7 +8,7 @@ import {
   actionBarCurrentPanel,
 } from "./state";
 import { Loader2 } from "lucide-react";
-import { CheckIfSomeItemIsSelected, FilterSections, OpenCloseKeys, UpDownKeys } from "./hooks";
+import { Hooks } from "./hooks";
 import { ActionBarPanel, ActionBarInternalItem } from "./types";
 import { ArrowUpRight } from "lucide-react";
 import { useCallback } from "react";
@@ -22,10 +22,7 @@ export const ActionBar = ({ panel }: ActionBarProps) => {
   }, []);
   return (
     <>
-      <UpDownKeys />
-      <OpenCloseKeys />
-      <CheckIfSomeItemIsSelected />
-      <FilterSections />
+      <Hooks />
       <Dialog>
         <Top />
         <div className="h-[1px] w-full bg-white/15"></div>

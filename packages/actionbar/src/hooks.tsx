@@ -128,3 +128,14 @@ export const FilterSections = () => {
   }, [search, panel]);
   return null;
 };
+
+export const Hooks = () => {
+  return (
+    <>
+      <OpenCloseKeys />
+      <UpDownKeys />
+      <CheckIfSomeItemIsSelected />
+      <FilterSections />
+    </>
+  );
+};
