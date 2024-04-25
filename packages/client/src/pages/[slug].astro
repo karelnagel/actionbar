@@ -1,0 +1,23 @@
+---
+import { Command, SearchIcon } from "lucide-react";
+import Layout from "../components/Layout.astro";
+import { ActionBarButton } from "../components/action-bar/Button";
+const { slug } = Astro.params;
+---
+
+<Layout title={undefined} description={undefined}>
+  <div class="flex items-center flex-col gap-4 justify-center py-10">
+    <span>{slug} page</span>
+    <ActionBarButton
+      className="border border-white/40 rounded-md p-2 text-white flex items-center gap-4"
+      client:load
+    >
+      <SearchIcon />
+      <span>Search and actions</span>
+      <div class="flex items-center border border-white/20 p-1 text-xs rounded-sm gap-[1px]">
+        <Command className="h-3 w-3" />
+        <span>K</span>
+      </div>
+    </ActionBarButton>
+  </div>
+</Layout>

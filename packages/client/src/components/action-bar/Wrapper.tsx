@@ -1,4 +1,4 @@
-import { FileIcon } from "lucide-react";
+import { CatIcon, DogIcon, HomeIcon } from "lucide-react";
 import { ActionBar } from "./ActionBar";
 import { ActionBarPanel } from "./types";
 import { compare } from "./hooks";
@@ -31,6 +31,63 @@ const getCitiesList = async (search: string) => {
     "New York",
   ].filter((x) => compare(x, search));
 };
+
+const degreesPanel = (country: string, city: string): ActionBarPanel => {
+  return {
+    placeholder: "Show temperature in",
+    name: city,
+    sections: {
+      temp: {
+        title: "Temperature",
+        type: "static",
+        items: ["Celsius", "Farenhite"].map((x) => ({
+          title: x,
+          action: () => {
+            alert(`User wanted temp in ${country} ${city} in ${x}`);
+          },
+        })),
+      },
+    },
+  };
+};
+
+const citiesPanel = (country: string): ActionBarPanel => {
+  return {
+    placeholder: "Search for city",
+    name: country,
+    sections: {
+      cities: {
+        title: "Cities",
+        type: "fetch-on-search",
+        items: async (search: string) => {
+          const cities = await getCitiesList(search);
+          return cities.map((city) => ({ title: city, panel: degreesPanel(country, city) }));
+        },
+      },
+    },
+  };
+};
+
+const countriesPanel: ActionBarPanel = {
+  placeholder: "Search for country",
+  name: "Weather",
+  sections: {
+    recommended: {
+      title: "Recommended",
+      type: "static",
+      items: [{ title: "USA" }, { title: "UK" }, { title: "Australia" }],
+    },
+    countries: {
+      title: "Countries",
+      type: "fetch-on-search",
+      items: async (search: string) => {
+        const countries = await getCountriesList(search);
+        return countries.map((country) => ({ title: country, panel: citiesPanel(country) }));
+      },
+    },
+  },
+};
+
 const PANEL: ActionBarPanel = {
   placeholder: "What do you need?",
   sections: {
@@ -38,17 +95,9 @@ const PANEL: ActionBarPanel = {
       title: "Pages",
       type: "static",
       items: [
-        { title: "Cats", action: "/cats", Icon: FileIcon },
-        { title: "Dogs", action: "/dogs" },
-        { title: "Rats", action: "/rats" },
-        { title: "Bats", action: "/bats" },
-        { title: "Cows", action: "/cows" },
-        { title: "Sheep", action: "/sheep" },
-        { title: "Pigs", action: "/pigs" },
-        { title: "Horses", action: "/horses" },
-        { title: "Bears", action: "/bears" },
-        { title: "Monkeys", action: "/monkeys" },
-        { title: "Snail", action: "/snail" },
+        { title: "Home", action: "/home", Icon: HomeIcon },
+        { title: "Cats", action: "/cats", Icon: CatIcon },
+        { title: "Dogs", action: "/dogs", Icon: DogIcon },
       ],
     },
     actions: {
@@ -64,69 +113,7 @@ const PANEL: ActionBarPanel = {
         },
         {
           title: "Weather",
-          panel: {
-            placeholder: "Search for country",
-            name: "Weather",
-            sections: {
-              recommended: {
-                title: "Recommended",
-                type: "static",
-                items: [{ title: "USA" }, { title: "UK" }, { title: "Australia" }],
-              },
-              countries: {
-                title: "Countries",
-                type: "fetch-on-search",
-                items: async (search: string) => {
-                  const countries = await getCountriesList(search);
-                  return countries.map((country) => ({
-                    title: country,
-                    panel: {
-                      placeholder: "Search for city",
-                      name: country,
-                      sections: {
-                        cities: {
-                          title: "Cities",
-                          type: "fetch-on-search",
-                          items: async (search: string) => {
-                            const cities = await getCitiesList(search);
-                            return cities.map((city) => ({
-                              title: city,
-                              panel: {
-                                placeholder: "C or F",
-                                name: city,
-                                sections: {
-                                  temp: {
-                                    title: "Temperature",
-                                    type: "static",
-                                    items: [
-                                      {
-                                        title: "Celsius",
-                                        action: () => {
-                                          alert(
-                                            `User wanted temp in ${country} ${city} in Celsius`,
-                                          );
-                                        },
-                                      },
-                                      {
-                                        title: "Farenhite",
-                                        action: () => {
-                                          alert(`User wanted temp in ${city} in Farenhite`);
-                                        },
-                                      },
-                                    ],
-                                  },
-                                },
-                              },
-                            }));
-                          },
-                        },
-                      },
-                    },
-                  }));
-                },
-              },
-            },
-          },
+          panel: countriesPanel,
         },
       ],
     },
