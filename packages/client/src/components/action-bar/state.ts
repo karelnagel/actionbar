@@ -12,6 +12,11 @@ export const actionBarCurrentPanel = computed(
   (panels) => panels[panels.length - 1],
 );
 
+actionBarOpen.listen(() => {
+  const panels = actionBarPanels.get();
+  if (panels.length > 1) actionBarPanels.set(panels.slice(0, 1));
+});
+
 export const actionBarVisibleSections = map<ActionBarSections>({});
 
 export const actionBarElements = computed(actionBarVisibleSections, (sections) => {

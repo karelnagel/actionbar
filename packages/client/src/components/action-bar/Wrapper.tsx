@@ -3,6 +3,7 @@ import { ActionBar } from "./ActionBar";
 import { ActionBarPanel } from "./types";
 import { compare } from "./hooks";
 import { MoonIcon } from "lucide-react";
+
 const getCountriesList = async (search: string) => {
   return [
     "Estonia",
@@ -17,6 +18,7 @@ const getCountriesList = async (search: string) => {
     "USA",
   ].filter((x) => compare(x, search));
 };
+
 const getCitiesList = async (search: string) => {
   return [
     "Tallinn",

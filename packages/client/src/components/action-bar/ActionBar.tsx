@@ -114,6 +114,7 @@ export const Item = ({ item }: { item: ActionBarItem }) => {
     if ("action" in item) {
       if (typeof item.action === "string") window.location.href = item.action;
       if (typeof item.action === "function") item.action();
+      actionBarOpen.set(false);
     } else if ("panel" in item) {
       actionBarPanels.set([...actionBarPanels.get(), item.panel]);
       actionBarSearch.set("");
