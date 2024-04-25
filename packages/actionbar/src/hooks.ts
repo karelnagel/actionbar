@@ -85,33 +85,37 @@ export const FilterSections = () => {
   const panel = useStore(actionBarCurrentPanel);
   const search = useStore(actionBarSearch);
   useEffect(() => {
-    const sections = panel?.sections;
-    if (!sections) return;
+    if (!panel) return;
 
     // Sets all the elements to loading
     const loadingDate = new Date();
     actionBarVisibleSections.set({});
-    for (const [key, section] of Object.entries(sections)) {
+    for (const [key, section] of Object.entries(panel.sections)) {
       actionBarVisibleSections.setKey(key, { ...section, items: [], loadingDate });
     }
-    // Object.entries(actionBarVisibleSections.get()).forEach(([key, section]) => {
-    //   actionBarVisibleSections.setKey(key, { ...section, loadingDate });
-    // });
 
-    const promises = Object.entries(sections).map(async ([key, section]) => {
+    const promises = Object.entries(panel.sections).map(async ([key, section]) => {
       let items;
       if (section.type === "static") {
         items = section.items.filter((i) => i.matchAll || compare(i.title, search));
-      } else if (section.type === "fetch-on-search") {
+      }
+      if (section.type === "fetch-on-search") {
         if (section.debounce) await new Promise((r) => setTimeout(r, section.debounce));
         const currentSection = actionBarVisibleSections.get()[key];
-        if (!currentSection?.loadingDate || currentSection?.loadingDate === loadingDate) {
+        if (
+          currentSection &&
+          (!currentSection?.loadingDate || currentSection?.loadingDate === loadingDate)
+        ) {
           items = await section.items(search);
         }
       }
       const oldSection = actionBarVisibleSections.get()[key];
       // To prevent the loading indicator from hiding when one fn finishes but it isn't the last one
-      if (items && (!oldSection?.loadingDate || oldSection?.loadingDate === loadingDate)) {
+      if (
+        oldSection &&
+        items &&
+        (!oldSection?.loadingDate || oldSection?.loadingDate === loadingDate)
+      ) {
         actionBarVisibleSections.setKey(key, {
           ...section,
           items: items.map((item, i) => ({ ...item, id: item.id || `${key}-${i}` })),

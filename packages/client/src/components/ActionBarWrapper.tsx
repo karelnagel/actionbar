@@ -1,4 +1,5 @@
 import {
+  Building2Icon,
   CatIcon,
   DogIcon,
   FlagIcon,
@@ -213,8 +214,9 @@ const PANEL: ActionBarPanel = {
     capitals: {
       title: "Capitals",
       type: "fetch-on-search",
+      debounce: 500,
       items: async (search: string) => {
-        if (!search.length) return [];
+        if (!search.length) return [{ title: "Start typing to search for capitals", icon: <Building2Icon /> }];
         const res = await findCapital(search);
         console.log(res);
         return res.map((x) => ({
