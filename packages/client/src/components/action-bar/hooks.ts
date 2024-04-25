@@ -18,6 +18,16 @@ const handleOpenCloseKeys = (e: any) => {
     e.preventDefault();
     actionBarOpen.set(false);
   }
+  const panels = actionBarPanels.get();
+  if (
+    e.key === "Backspace" &&
+    actionBarOpen.get() &&
+    actionBarSearch.get() === "" &&
+    panels.length > 1
+  ) {
+    e.preventDefault();
+    actionBarPanels.set(panels.slice(0, -1));
+  }
 };
 export const OpenCloseKeys = () => {
   useEffect(() => {

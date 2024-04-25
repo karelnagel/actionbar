@@ -1,8 +1,8 @@
-import { CatIcon, DogIcon, HomeIcon } from "lucide-react";
+import { CatIcon, DogIcon, HomeIcon, SunIcon } from "lucide-react";
 import { ActionBar } from "./ActionBar";
 import { ActionBarPanel } from "./types";
 import { compare } from "./hooks";
-
+import { MoonIcon } from "lucide-react";
 const getCountriesList = async (search: string) => {
   return [
     "Estonia",
@@ -75,7 +75,7 @@ const countriesPanel: ActionBarPanel = {
     recommended: {
       title: "Recommended",
       type: "static",
-      items: [{ title: "USA" }, { title: "UK" }, { title: "Australia" }],
+      items: ["USA", "UK", "Estonia"].map((x) => ({ title: x, panel: citiesPanel(x) })),
     },
     countries: {
       title: "Countries",
@@ -106,13 +106,29 @@ const PANEL: ActionBarPanel = {
       items: [
         {
           title: "Change theme",
-          action: () => {
-            document.body.classList.toggle("dark");
-            alert("changed");
+          panel: {
+            name: "Theme",
+            placeholder: "Select theme",
+            sections: {
+              themes: {
+                title: "Themes",
+                type: "static",
+                items: [
+                  { title: "Light", Icon: SunIcon },
+                  { title: "Dark", Icon: MoonIcon },
+                ].map((x) => ({
+                  ...x,
+                  action: () => {
+                    document.body.classList.toggle(x.title.toLowerCase());
+                    alert(`Changed theme to ${x.title}`);
+                  },
+                })),
+              },
+            },
           },
         },
         {
-          title: "Weather",
+          title: "Current weather",
           panel: countriesPanel,
         },
       ],
