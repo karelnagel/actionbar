@@ -182,7 +182,6 @@ const PANEL: ActionBarPanel = {
         if (!search.length)
           return [{ title: "Start typing to search for capitals", icon: <Building2Icon /> }];
         const res = await findCapital(search);
-        console.log(res);
         return res.map((x) => ({
           title: x.capital[0],
           action: `/${x.capital[0]}`,
@@ -194,5 +193,5 @@ const PANEL: ActionBarPanel = {
 };
 
 export const ActionBarWrapper = () => {
-  return <ActionBar panel={PANEL} />;
+  return <ActionBar panel={PANEL} style={{}} />;
 };

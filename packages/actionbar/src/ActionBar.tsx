@@ -6,45 +6,62 @@ import {
   actionBarSearch,
   actionBarPanels,
   actionBarCurrentPanel,
+  actionBarStyle,
+  useActionBarStyle,
+  col,
 } from "./state";
 import { ArrowUpDown, CommandIcon, DeleteIcon, Loader2 } from "lucide-react";
 import { Hooks, callAction } from "./hooks";
-import { ActionBarPanel, ActionBarInternalItem } from "./types";
+import { ActionBarInternalItem, ActionBarProps } from "./types";
 import { ArrowUpRight } from "lucide-react";
 import { actionBarSelectedId } from "./state";
 
-export type ActionBarProps = { panel: ActionBarPanel };
-
-export const ActionBar = ({ panel }: ActionBarProps) => {
+export const ActionBar = ({ panel, style }: ActionBarProps) => {
   useEffect(() => {
     actionBarPanels.set([panel]);
-  }, []);
+    if (style) actionBarStyle.set({ ...actionBarStyle.get(), ...style });
+  }, [style]);
   return (
     <>
       <Hooks />
       <Dialog>
         <Top />
-        <div className="h-[1px] w-full bg-white/15"></div>
+        <Divider />
         <Middle />
+        <Divider />
         <Bottom />
       </Dialog>
     </>
   );
 };
+const Divider = () => {
+  const style = useActionBarStyle();
+  return <div style={{ backgroundColor: style.borderColor }} className="h-[1px] w-full"></div>;
+};
 
 const Dialog = ({ children }: { children: ReactNode }) => {
   const open = useStore(actionBarOpen);
-
+  const style = useActionBarStyle();
   return (
     <div
-      style={{ colorScheme: "dark" }}
-      className={`fixed left-0 top-0 h-screen w-screen items-start justify-center p-4 pt-[20vh] duration-150 ${
-        open ? "flex bg-black/20" : "hidden"
-      }`}
+      style={{
+        colorScheme: style.colorScheme,
+        backgroundColor: style.shadowColor,
+        display: open ? "flex" : "none",
+        paddingTop: `${style.paddingTop}vh`,
+      }}
+      className={`fixed left-0 top-0 h-screen w-screen items-start justify-center p-4 duration-150`}
       onClick={() => actionBarOpen.set(false)}
     >
       <div
-        className="flex h-full max-h-[400px] w-full max-w-[700px] flex-col overflow-hidden rounded-2xl border border-white/15 bg-[#121212] text-white"
+        style={{
+          maxHeight: style.maxHeight,
+          maxWidth: style.maxWidth,
+          backgroundColor: style.backgroundColor,
+          color: style.textColor,
+          borderColor: style.borderColor,
+        }}
+        className="flex h-full w-full flex-col overflow-hidden rounded-2xl border"
         onClick={(e) => e.stopPropagation()}
       >
         {children}
@@ -59,6 +76,7 @@ const Top = () => {
   const inputRef = useRef<HTMLInputElement>(null);
   const panels = useStore(actionBarPanels);
   const panel = useStore(actionBarCurrentPanel);
+  const s = useActionBarStyle();
   useEffect(() => inputRef.current?.focus(), [open]);
   return (
     <div className="flex items-center gap-2 p-4 text-[18px]">
@@ -68,7 +86,8 @@ const Top = () => {
           <Fragment key={i}>
             <span
               onClick={() => actionBarPanels.set(panels.slice(0, i + 1))}
-              className="cursor-pointer whitespace-nowrap rounded-md hover:bg-white/10"
+              style={{ outlineColor: col(s.textColor, 0.1) }}
+              className="cursor-pointer whitespace-nowrap rounded-md p-1 hover:outline"
             >
               {panel.name}
             </span>
@@ -78,7 +97,7 @@ const Top = () => {
       <input
         ref={inputRef}
         type="text"
-        className="placeholder:text-current/50 w-full bg-transparent focus:outline-none"
+        className="placeholder:text-current/60 w-full bg-transparent focus:outline-none"
         value={search}
         placeholder={panel?.placeholder}
         onChange={(e) => actionBarSearch.set(e.target.value)}
@@ -103,10 +122,10 @@ const Middle = () => {
 
 const Bottom = () => {
   return (
-    <div className="flex w-full items-center justify-between border-t border-white/15 px-4 py-1 text-xs opacity-70">
+    <div className="flex w-full items-center justify-between px-4 py-1 text-xs opacity-70">
       <p>
         Powered by{" "}
-        <a className="text-blue-300" target="_blank" href="https://actionbar.asius.ai">
+        <a className="text-blue-400" target="_blank" href="https://actionbar.asius.ai">
           ActionBar
         </a>
       </p>
@@ -115,15 +134,9 @@ const Bottom = () => {
           { Icon: ArrowUpDown, text: "Navigate" },
           { Icon: DeleteIcon, text: "Go back" },
           { Icon: Enter, text: "Select" },
-          {
-            Icon: CmdK,
-            text: "Open",
-          },
+          { Icon: CmdK, text: "Open" },
         ].map(({ Icon, text }) => (
-          <div
-            key={text}
-            className="flex items-center gap-1 rounded-md p-1 duration-150 hover:bg-white/20"
-          >
+          <div key={text} className="flex items-center gap-1 rounded-md p-1 duration-150">
             <Icon className="h-4 w-auto" />
             <span className="text-xs">{text}</span>
           </div>
@@ -142,7 +155,7 @@ const CmdK = ({ className }: { className?: string }) => (
 
 const Section = ({ title, loading }: { title: string; loading: boolean }) => {
   return (
-    <div className="flex items-center gap-1 py-1 text-sm text-white/50">
+    <div className="flex items-center gap-1 py-1 text-sm opacity-60">
       <p>{title}</p>
       {loading && <Loader2 className="h-3 w-3 animate-spin" />}
     </div>
@@ -152,14 +165,21 @@ const Section = ({ title, loading }: { title: string; loading: boolean }) => {
 export const Item = ({ item }: { item: ActionBarInternalItem }) => {
   const selectedId = useStore(actionBarSelectedId);
   const selected = selectedId === item.id;
-  // Todo solve onClick
+  const style = useActionBarStyle();
   return (
     <div
       id={item.id}
       onMouseEnter={() => actionBarSelectedId.set(item.id)}
-      className={`${selected ? "bg-white/10 text-white" : "text-white/70"} ${
-        item.disabled ? "cursor-not-allowed text-white/50" : "cursor-pointer"
-      } flex items-center gap-2 rounded-md p-2 text-[15px] duration-150`}
+      style={{
+        background: selected ? col(style.textColor, 0.15) : undefined,
+        cursor: item.disabled ? "not-allowed" : "pointer",
+        color: item.disabled
+          ? col(style.textColor, 0.5)
+          : selected
+            ? style.textColor
+            : col(style.textColor, 0.7),
+      }}
+      className="flex items-center gap-2 rounded-md p-2 text-[15px] duration-150"
       onClick={() => callAction(item)}
     >
       <div className="flex h-5 w-5 items-center justify-center rounded-md">
@@ -167,7 +187,8 @@ export const Item = ({ item }: { item: ActionBarInternalItem }) => {
       </div>
       <span>{item.title}</span>
       <span
-        className={`${selected ? "opacity-60" : "opacity-0"} ml-auto rounded-md  p-1 text-xs duration-150`}
+        style={{ opacity: selected ? 0.6 : 0 }}
+        className="ml-auto rounded-md  p-1 text-xs duration-150"
       >
         <Enter />
       </span>

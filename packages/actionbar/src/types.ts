@@ -1,5 +1,18 @@
 import { ReactNode } from "react";
 
+export type ActionBarStyle = {
+  backgroundColor: string;
+  shadowColor: string;
+  borderColor: string;
+  textColor: string;
+  maxHeight: number;
+  maxWidth: number;
+  colorScheme: "light" | "dark";
+  paddingTop: number;
+};
+
+export type ActionBarProps = { panel: ActionBarPanel; style?: Partial<ActionBarStyle> };
+
 export type ActionBarPanel = {
   sections: Record<string, ActionBarSection>;
   placeholder: string;

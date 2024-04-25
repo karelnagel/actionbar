@@ -1,5 +1,25 @@
 import { atom, computed, map } from "nanostores";
-import { ActionBarInternalElement, ActionBarPanel, ActionBarInternalSection } from "./types";
+import {
+  ActionBarInternalElement,
+  ActionBarPanel,
+  ActionBarInternalSection,
+  ActionBarStyle,
+} from "./types";
+import { useStore } from "@nanostores/react";
+
+export const col = (hex: string, opacity: number) => hex + Math.round(opacity * 255).toString(16);
+
+export const actionBarStyle = atom<ActionBarStyle>({
+  backgroundColor: "#121212",
+  shadowColor: col("#121212", 0.2),
+  borderColor: col("#FFFFFF", 0.15),
+  textColor: "#FFFFFF",
+  maxHeight: 400,
+  maxWidth: 700,
+  colorScheme: "dark",
+  paddingTop: 20,
+});
+export const useActionBarStyle = () => useStore(actionBarStyle);
 
 export const actionBarOpen = atom(true);
 export const actionBarSearch = atom("");
