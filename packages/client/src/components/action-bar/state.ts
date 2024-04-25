@@ -16,7 +16,7 @@ export const actionBarVisibleSections = map<ActionBarSections>({});
 
 export const actionBarElements = computed(actionBarVisibleSections, (sections) => {
   const elements: ActionBarElement[] = Object.values(sections)
-    .filter((section) => section.items.length)
+    .filter((section) => section.loadingDate !== null || section.items.length)
     .flatMap((section) => [
       { type: "section", title: section.title, loading: section.loadingDate !== null },
       ...(section.items.map((item) => ({ type: "item" as const, item })) || []),
