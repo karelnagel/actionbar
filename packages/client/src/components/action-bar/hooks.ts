@@ -6,6 +6,7 @@ import {
   actionBarPanels,
   actionBarSelectedId,
   actionBarVisibleSections,
+  actionBarCurrentPanel,
 } from "./state";
 import { useStore } from "@nanostores/react";
 
@@ -81,11 +82,10 @@ export const CheckIfSomeItemIsSelected = () => {
 export const compare = (a: string, b: string) => a.toLowerCase().includes(b.toLowerCase());
 
 export const FilterSections = () => {
-  const panels = useStore(actionBarPanels);
-
+  const panel = useStore(actionBarCurrentPanel);
   const search = useStore(actionBarSearch);
   useEffect(() => {
-    const sections = panels[panels.length - 1]?.sections;
+    const sections = panel?.sections;
     if (!sections) return;
 
     // Sets all the elements to loading
@@ -121,6 +121,6 @@ export const FilterSections = () => {
     });
 
     Promise.all(promises);
-  }, [search, panels]);
+  }, [search, panel]);
   return null;
 };

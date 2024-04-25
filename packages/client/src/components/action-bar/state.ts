@@ -5,7 +5,6 @@ export const actionBarOpen = atom(true);
 export const actionBarSearch = atom("");
 export const actionBarSelectedId = atom<string | null>(null);
 
-// Todo rename to actionBarPanels
 export const actionBarPanels = atom<ActionBarPanel[]>([]);
 export const actionBarCurrentPanel = computed(
   actionBarPanels,

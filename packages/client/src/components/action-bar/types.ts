@@ -1,4 +1,4 @@
-import type { LucideIcon } from "lucide-react";
+import { ReactNode } from "react";
 
 export type ActionBarPanel = {
   sections: Record<string, ActionBarSectionInput>;
@@ -26,7 +26,7 @@ export type ActionBarSectionInput = {
 export type ActionBarItemInput = {
   id?: string;
   title: string;
-  Icon?: LucideIcon;
+  icon?: ReactNode;
   cta?: string;
 } & (
   | {

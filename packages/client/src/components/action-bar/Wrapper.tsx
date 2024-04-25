@@ -1,4 +1,4 @@
-import { CatIcon, DogIcon, HomeIcon, SunIcon } from "lucide-react";
+import { CatIcon, DogIcon, HomeIcon, SunIcon, ThermometerIcon } from "lucide-react";
 import { ActionBar } from "./ActionBar";
 import { ActionBarPanel } from "./types";
 import { compare } from "./hooks";
@@ -14,7 +14,7 @@ const CITIES = {
   Berlin: { lat: 52.520833, lng: 13.409722, flag: "https://flagcdn.com/w40/de.png" },
   Paris: { lat: 48.856667, lng: 2.352222, flag: "https://flagcdn.com/w40/fr.png" },
   Madrid: { lat: 40.416775, lng: -3.70379, flag: "https://flagcdn.com/w40/es.png" },
-  London: { lat: 51.507351, lng: -0.127621, flag: "https://flagcdn.com/w40/uk.png" },
+  London: { lat: 51.507351, lng: -0.127621, flag: "https://flagcdn.com/w40/gb.png" },
   NewYork: { lat: 40.712776, lng: -74.005974, flag: "https://flagcdn.com/w40/us.png" },
 };
 
@@ -28,6 +28,7 @@ const degreesPanel = (city: string): ActionBarPanel => {
         type: "static",
         items: ["Celsius", "Farenhite"].map((degrees) => ({
           title: degrees,
+          icon: <p className="font-bold text-blue-500">{degrees.slice(0, 1).toUpperCase()}</p>,
           action: async () => {
             const { lat, lng } = CITIES[city as keyof typeof CITIES];
             const res = await fetch(
@@ -49,8 +50,9 @@ const citiesPanel: ActionBarPanel = {
     recommended: {
       title: "Recommended",
       type: "static",
-      items: ["Tallinn", "Helsinki", "New York"].map((city) => ({
+      items: ["Paris", "Madrid", "NewYork"].map((city) => ({
         title: city,
+        icon: <img src={CITIES[city as keyof typeof CITIES].flag} />,
         panel: degreesPanel(city),
       })),
     },
@@ -58,9 +60,10 @@ const citiesPanel: ActionBarPanel = {
       title: "Countries",
       type: "fetch-on-search",
       items: async (search: string) => {
-        const cities = Object.keys(CITIES).filter((x) => compare(x, search));
-        return cities.map((city) => ({
+        const cities = Object.entries(CITIES).filter(([city]) => compare(city, search));
+        return cities.map(([city, { flag }]) => ({
           title: city,
+          icon: <img src={flag} />,
           panel: degreesPanel(city),
         }));
       },
@@ -75,9 +78,9 @@ const PANEL: ActionBarPanel = {
       title: "Pages",
       type: "static",
       items: [
-        { title: "Home", action: "/home", Icon: HomeIcon },
-        { title: "Cats", action: "/cats", Icon: CatIcon },
-        { title: "Dogs", action: "/dogs", Icon: DogIcon },
+        { title: "Home", action: "/home", icon: <HomeIcon /> },
+        { title: "Cats", action: "/cats", icon: <CatIcon /> },
+        { title: "Dogs", action: "/dogs", icon: <DogIcon /> },
       ],
     },
     actions: {
@@ -86,6 +89,7 @@ const PANEL: ActionBarPanel = {
       items: [
         {
           title: "Change theme",
+          icon: <SunIcon />,
           panel: {
             name: "Theme",
             placeholder: "Select theme",
@@ -94,8 +98,8 @@ const PANEL: ActionBarPanel = {
                 title: "Themes",
                 type: "static",
                 items: [
-                  { title: "Light", Icon: SunIcon },
-                  { title: "Dark", Icon: MoonIcon },
+                  { title: "Light", icon: <SunIcon /> },
+                  { title: "Dark", icon: <MoonIcon /> },
                 ].map((x) => ({
                   ...x,
                   action: () => {
@@ -109,6 +113,7 @@ const PANEL: ActionBarPanel = {
         },
         {
           title: "Current weather",
+          icon: <ThermometerIcon />,
           panel: citiesPanel,
         },
       ],

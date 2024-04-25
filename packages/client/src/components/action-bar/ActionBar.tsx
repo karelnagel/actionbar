@@ -63,15 +63,21 @@ const Top = () => {
   const panels = useStore(actionBarPanels);
   const panel = useStore(actionBarCurrentPanel);
   useEffect(() => inputRef.current?.focus(), [open]);
-  const sections = panels.map((panel) => panel.name).filter(Boolean);
   return (
     <div className="flex items-center gap-2 p-4 text-[18px]">
-      {sections.map((section, i) => (
-        <Fragment key={i}>
-          <span className="whitespace-nowrap">{section}</span>
-          <span>/</span>
-        </Fragment>
-      ))}
+      {panels
+        .filter((panel) => panel.name)
+        .map((panel, i) => (
+          <Fragment key={i}>
+            <span
+              onClick={() => actionBarPanels.set(panels.slice(0, i + 1))}
+              className="hover:bg-white/10 rounded-md cursor-pointer whitespace-nowrap"
+            >
+              {panel.name}
+            </span>
+            <span>/</span>
+          </Fragment>
+        ))}
       <input
         ref={inputRef}
         type="text"
@@ -130,7 +136,6 @@ export const Item = ({ item }: { item: ActionBarItem }) => {
     return () => document.removeEventListener("keydown", listenToEnter);
   }, [selected, action]);
 
-  const Icon = item.Icon || ArrowUpRight;
   return (
     <div
       id={item.id}
@@ -138,7 +143,9 @@ export const Item = ({ item }: { item: ActionBarItem }) => {
       className={`${selected ? "bg-white/10 text-white" : "text-white/70"} flex cursor-pointer items-center gap-2 rounded-md p-2 text-[15px] duration-150`}
       onClick={action}
     >
-      <Icon className={`h-5 w-5 rounded-md `} />
+      <div className="flex h-5 w-5 items-center justify-center rounded-md">
+        {item.icon || <ArrowUpRight />}
+      </div>
       <span>{item.title}</span>
       <span
         className={`${selected ? "opacity-60" : "opacity-0"} ml-auto rounded-md  p-1 text-xs duration-150`}
