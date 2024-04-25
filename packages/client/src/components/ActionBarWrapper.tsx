@@ -1,4 +1,13 @@
-import { CatIcon, DogIcon, FlagIcon, HomeIcon, SunIcon, ThermometerIcon } from "lucide-react";
+import {
+  CatIcon,
+  DogIcon,
+  FlagIcon,
+  HomeIcon,
+  MailIcon,
+  SunIcon,
+  ThermometerIcon,
+  XIcon,
+} from "lucide-react";
 import { ActionBar, type ActionBarPanel } from "@actionbar/react";
 import { MoonIcon } from "lucide-react";
 import { toast } from "sonner";
@@ -138,6 +147,51 @@ const PANEL: ActionBarPanel = {
           title: "Current weather",
           icon: <ThermometerIcon />,
           panel: citiesPanel,
+        },
+        {
+          title: "Contact us",
+          icon: <MailIcon />,
+          panel: {
+            name: "Contact",
+            placeholder: "Type your email?",
+            sections: {
+              options: {
+                type: "fetch-on-search",
+                items: async (email: string) => {
+                  const isValid = email.includes("@");
+                  return [
+                    {
+                      title: isValid ? "Go forward" : "Invalid email",
+                      icon: isValid ? <MailIcon /> : <XIcon />,
+                      disabled: !isValid,
+                      panel: {
+                        placeholder: "Type your message",
+                        name: email,
+                        sections: {
+                          message: {
+                            type: "fetch-on-search",
+                            items: async (search: string) => {
+                              const isValid = search.length > 0;
+                              return [
+                                {
+                                  title: "Send message",
+                                  disabled: !isValid,
+                                  icon: <MailIcon />,
+                                  action: ({ search }) => {
+                                    toast(`Sending message: ${search} from ${email}`);
+                                  },
+                                },
+                              ];
+                            },
+                          },
+                        },
+                      },
+                    },
+                  ];
+                },
+              },
+            },
+          },
         },
       ],
     },

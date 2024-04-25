@@ -6,7 +6,7 @@ export type ActionBarPanel = {
   name?: string;
 };
 export type ActionBarSectionInput = {
-  title: string;
+  title?: string;
 } & (
   | {
       type: "static";
@@ -23,21 +23,24 @@ export type ActionBarSectionInput = {
     }
 );
 
+type ActionArgs = { search: string };
+
 export type ActionBarItemInput = {
   id?: string;
   title: string;
   icon?: ReactNode;
-  cta?: string;
+  matchAll?: boolean;
+  disabled?: boolean;
 } & (
   | {
-      action?: string | (() => void) | (() => Promise<void>);
+      action?: string | ((a: ActionArgs) => void) | ((a: ActionArgs) => Promise<void>);
     }
   | { panel: ActionBarPanel }
 );
 
 export type ActionBarSections = Record<string, ActionBarSection>;
 export type ActionBarSection = {
-  title: string;
+  title?: string;
   items: ActionBarItem[];
   loadingDate: Date | null;
 };
@@ -45,5 +48,5 @@ export type ActionBarSection = {
 export type ActionBarItem = ActionBarItemInput & { id: string };
 
 export type ActionBarElement =
-  | { type: "section"; title: string; loading: boolean }
+  | { type: "section"; title?: string; loading: boolean }
   | { type: "item"; item: ActionBarItem };

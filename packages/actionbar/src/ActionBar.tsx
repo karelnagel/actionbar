@@ -71,7 +71,7 @@ const Top = () => {
           <Fragment key={i}>
             <span
               onClick={() => actionBarPanels.set(panels.slice(0, i + 1))}
-              className="hover:bg-white/10 rounded-md cursor-pointer whitespace-nowrap"
+              className="cursor-pointer whitespace-nowrap rounded-md hover:bg-white/10"
             >
               {panel.name}
             </span>
@@ -96,9 +96,9 @@ const Bottom = () => {
   return (
     <div className="flex h-full flex-col overflow-y-auto p-3">
       {elements.map((e) => {
-        if (e.type === "section")
+        if (e.type === "section" && e.title)
           return <Section key={e.title} title={e.title} loading={e.loading} />;
-        return <Item key={e.item.id} item={e.item} />;
+        else if (e.type === "item") return <Item key={e.item.id} item={e.item} />;
       })}
     </div>
   );
@@ -116,16 +116,18 @@ const Section = ({ title, loading }: { title: string; loading: boolean }) => {
 export const Item = ({ item }: { item: ActionBarItem }) => {
   const selectedId = useStore(actionBarSelectedId);
   const selected = selectedId === item.id;
+
+  // Todo move to hooks
   const action = useCallback(() => {
+    if (item.disabled) return;
     if ("action" in item) {
       if (typeof item.action === "string") window.location.href = item.action;
-      if (typeof item.action === "function") item.action();
+      if (typeof item.action === "function") item.action({ search: actionBarSearch.get() });
       actionBarOpen.set(false);
     } else if ("panel" in item) {
       actionBarPanels.set([...actionBarPanels.get(), item.panel]);
       actionBarSearch.set("");
     }
-    // Todo: if not action then it should go into the new sections
   }, [item]);
 
   useEffect(() => {
@@ -140,7 +142,9 @@ export const Item = ({ item }: { item: ActionBarItem }) => {
     <div
       id={item.id}
       onMouseEnter={() => actionBarSelectedId.set(item.id)}
-      className={`${selected ? "bg-white/10 text-white" : "text-white/70"} flex cursor-pointer items-center gap-2 rounded-md p-2 text-[15px] duration-150`}
+      className={`${selected ? "bg-white/10 text-white" : "text-white/70"} ${
+        item.disabled ? "cursor-not-allowed text-white/50" : "cursor-pointer"
+      } flex items-center gap-2 rounded-md p-2 text-[15px] duration-150`}
       onClick={action}
     >
       <div className="flex h-5 w-5 items-center justify-center rounded-md">
@@ -150,7 +154,7 @@ export const Item = ({ item }: { item: ActionBarItem }) => {
       <span
         className={`${selected ? "opacity-60" : "opacity-0"} ml-auto rounded-md  p-1 text-xs duration-150`}
       >
-        {item.cta || "Go to"}
+        Enter
       </span>
     </div>
   );

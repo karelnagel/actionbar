@@ -14,6 +14,7 @@ export const actionBarCurrentPanel = computed(
 actionBarOpen.listen(() => {
   const panels = actionBarPanels.get();
   if (panels.length > 1) actionBarPanels.set(panels.slice(0, 1));
+  actionBarSearch.set("");
 });
 
 export const actionBarVisibleSections = map<ActionBarSections>({});

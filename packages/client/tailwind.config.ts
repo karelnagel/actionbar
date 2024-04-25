@@ -14,5 +14,5 @@ export default {
     },
   },
   plugins: [typography],
-  content: ["./src/**/*.{js,ts,jsx,tsx,astro}"],
+  content: ["./src/**/*.{js,ts,jsx,tsx,astro}", "../actionbar/src/**/*.{js,ts,jsx,tsx,astro}"],
 } satisfies Config;

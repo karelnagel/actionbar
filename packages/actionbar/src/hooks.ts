@@ -101,7 +101,7 @@ export const FilterSections = () => {
     const promises = Object.entries(sections).map(async ([key, section]) => {
       let items;
       if (section.type === "static") {
-        items = section.items.filter((i) => compare(i.title, search));
+        items = section.items.filter((i) => i.matchAll || compare(i.title, search));
       } else if (section.type === "fetch-on-search") {
         if (section.debounce) await new Promise((r) => setTimeout(r, section.debounce));
         const currentSection = actionBarVisibleSections.get()[key];
