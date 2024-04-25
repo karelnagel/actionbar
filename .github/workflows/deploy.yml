@@ -4,6 +4,7 @@ env:
   ASTRO_STUDIO_APP_TOKEN: ${{secrets.ASTRO_STUDIO_APP_TOKEN }}
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  EXAMPLE_DOMAIN: ${{ secrets.EXAMPLE_DOMAIN }}
 
 on:
   push:
