@@ -60,10 +60,10 @@ should use something like CMD+k popup and show a list of actions. you can search
 
 
 ## Roadmap
-1. Example site
+1. <s>Example site</s>
     1. Implement basic website scraping, use OpenAI embeddings and store the data into turso db
-    2. Implement search functionality
-    3. Implement basic actions with js callbacks and API calls
+    2. <s>Implement search functionality</s>
+    3. <s>Implement basic actions with js callbacks and API calls</s>
 2. External package for FE components
 3. External package for BE functions
 4. SST package for easy installation for every SST project 
