@@ -50,7 +50,7 @@ const Dialog = ({ children }: { children: ReactNode }) => {
         display: open ? "flex" : "none",
         paddingTop: `${s.paddingTop}vh`,
       }}
-      className="fixed left-0 top-0 h-screen w-screen items-start justify-center p-4 backdrop-blur-sm duration-150"
+      className="fixed left-0 top-0 z-50 h-screen w-screen items-start justify-center p-4 backdrop-blur-sm duration-150"
       onClick={() => actionBarOpen.set(false)}
     >
       <div

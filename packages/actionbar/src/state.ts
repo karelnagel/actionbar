@@ -23,7 +23,7 @@ export const actionBarStyle = atom<ActionBarStyle>({
 });
 export const useActionBarStyle = () => useStore(actionBarStyle);
 
-export const actionBarOpen = atom(true);
+export const actionBarOpen = atom(false);
 export const actionBarSearch = atom("");
 export const actionBarSelectedId = atom<string | null>(null);
 
