@@ -7,7 +7,7 @@ import {
   actionBarPanels,
   actionBarCurrentPanel,
 } from "./state";
-import { Loader2 } from "lucide-react";
+import { ArrowUpDown, CommandIcon, DeleteIcon, Loader2 } from "lucide-react";
 import { Hooks, callAction } from "./hooks";
 import { ActionBarPanel, ActionBarInternalItem } from "./types";
 import { ArrowUpRight } from "lucide-react";
@@ -25,6 +25,7 @@ export const ActionBar = ({ panel }: ActionBarProps) => {
       <Dialog>
         <Top />
         <div className="h-[1px] w-full bg-white/15"></div>
+        <Middle />
         <Bottom />
       </Dialog>
     </>
@@ -43,7 +44,7 @@ const Dialog = ({ children }: { children: ReactNode }) => {
       onClick={() => actionBarOpen.set(false)}
     >
       <div
-        className="flex h-full max-h-[380px] w-full max-w-[700px] flex-col overflow-hidden rounded-2xl border border-white/15 bg-[#121212] text-white"
+        className="flex h-full max-h-[400px] w-full max-w-[700px] flex-col overflow-hidden rounded-2xl border border-white/15 bg-[#121212] text-white"
         onClick={(e) => e.stopPropagation()}
       >
         {children}
@@ -86,7 +87,7 @@ const Top = () => {
   );
 };
 
-const Bottom = () => {
+const Middle = () => {
   const elements = useStore(actionBarElements);
 
   return (
@@ -99,6 +100,45 @@ const Bottom = () => {
     </div>
   );
 };
+
+const Bottom = () => {
+  return (
+    <div className="flex w-full items-center justify-between border-t border-white/15 px-4 py-1 text-xs opacity-70">
+      <p>
+        Powered by{" "}
+        <a className="text-blue-300" target="_blank" href="https://actionbar.asius.ai">
+          ActionBar
+        </a>
+      </p>
+      <div className="flex items-center gap-4">
+        {[
+          { Icon: ArrowUpDown, text: "Navigate" },
+          { Icon: DeleteIcon, text: "Go back" },
+          { Icon: Enter, text: "Select" },
+          {
+            Icon: CmdK,
+            text: "Open",
+          },
+        ].map(({ Icon, text }) => (
+          <div
+            key={text}
+            className="flex items-center gap-1 rounded-md p-1 duration-150 hover:bg-white/20"
+          >
+            <Icon className="h-4 w-auto" />
+            <span className="text-xs">{text}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const CmdK = ({ className }: { className?: string }) => (
+  <div className={"flex items-center gap-[1px] text-xs " + className}>
+    <CommandIcon className="h-3 w-3" />
+    <span>K</span>
+  </div>
+);
 
 const Section = ({ title, loading }: { title: string; loading: boolean }) => {
   return (
@@ -135,9 +175,16 @@ export const Item = ({ item }: { item: ActionBarInternalItem }) => {
   );
 };
 
-const Enter = () => {
+const Enter = ({ className }: { className?: string }) => {
   return (
-    <svg fill="none" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+    <svg
+      fill="none"
+      height="24"
+      className={className}
+      viewBox="0 0 24 24"
+      width="24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
       <g clipRule="evenodd" fill="currentColor" fillRule="evenodd">
         <path d="m3 14a1 1 0 0 1 1-1h12a3 3 0 0 0 3-3v-4a1 1 0 1 1 2 0v4a5 5 0 0 1 -5 5h-12a1 1 0 0 1 -1-1z" />
         <path d="m3.293 14.707a1 1 0 0 1 0-1.414l4-4a1 1 0 0 1 1.414 1.414l-3.293 3.293 3.293 3.293a1 1 0 1 1 -1.414 1.414z" />
