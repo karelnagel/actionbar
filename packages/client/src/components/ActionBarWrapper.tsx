@@ -1,6 +1,5 @@
 import { CatIcon, DogIcon, FlagIcon, HomeIcon, SunIcon, ThermometerIcon } from "lucide-react";
-import { ActionBar } from "./ActionBar";
-import { ActionBarPanel } from "./types";
+import { ActionBar, type ActionBarPanel } from "@actionbar/react";
 import { MoonIcon } from "lucide-react";
 import { toast } from "sonner";
 
