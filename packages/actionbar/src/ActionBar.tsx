@@ -50,7 +50,7 @@ const Dialog = ({ children }: { children: ReactNode }) => {
         display: open ? "flex" : "none",
         paddingTop: `${s.paddingTop}vh`,
       }}
-      className={`fixed left-0 top-0 h-screen w-screen items-start justify-center p-4 duration-150`}
+      className="fixed left-0 top-0 h-screen w-screen items-start justify-center p-4 backdrop-blur-sm duration-150"
       onClick={() => actionBarOpen.set(false)}
     >
       <div
@@ -123,6 +123,7 @@ const Middle = () => {
 
 const Bottom = () => {
   const s = useActionBarStyle();
+  if (s.hideBottom) return null;
   return (
     <div className="flex w-full items-center justify-between px-4 py-1 text-xs opacity-70">
       <p>

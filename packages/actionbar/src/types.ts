@@ -10,6 +10,7 @@ export type ActionBarStyle = {
   colorScheme: "light" | "dark";
   paddingTop: number;
   roundness: number;
+  hideBottom: boolean;
 };
 
 export type ActionBarProps = { panel: ActionBarPanel; style?: Partial<ActionBarStyle> };
