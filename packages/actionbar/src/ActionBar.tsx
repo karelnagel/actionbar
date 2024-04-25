@@ -35,33 +35,34 @@ export const ActionBar = ({ panel, style }: ActionBarProps) => {
   );
 };
 const Divider = () => {
-  const style = useActionBarStyle();
-  return <div style={{ backgroundColor: style.borderColor }} className="h-[1px] w-full"></div>;
+  const s = useActionBarStyle();
+  return <div style={{ backgroundColor: s.borderColor }} className="h-[1px] w-full"></div>;
 };
 
 const Dialog = ({ children }: { children: ReactNode }) => {
   const open = useStore(actionBarOpen);
-  const style = useActionBarStyle();
+  const s = useActionBarStyle();
   return (
     <div
       style={{
-        colorScheme: style.colorScheme,
-        backgroundColor: style.shadowColor,
+        colorScheme: s.colorScheme,
+        backgroundColor: s.shadowColor,
         display: open ? "flex" : "none",
-        paddingTop: `${style.paddingTop}vh`,
+        paddingTop: `${s.paddingTop}vh`,
       }}
       className={`fixed left-0 top-0 h-screen w-screen items-start justify-center p-4 duration-150`}
       onClick={() => actionBarOpen.set(false)}
     >
       <div
         style={{
-          maxHeight: style.maxHeight,
-          maxWidth: style.maxWidth,
-          backgroundColor: style.backgroundColor,
-          color: style.textColor,
-          borderColor: style.borderColor,
+          maxHeight: s.maxHeight,
+          maxWidth: s.maxWidth,
+          backgroundColor: s.backgroundColor,
+          color: s.textColor,
+          borderColor: s.borderColor,
+          borderRadius: 16 * s.roundness,
         }}
-        className="flex h-full w-full flex-col overflow-hidden rounded-2xl border"
+        className="flex h-full w-full flex-col overflow-hidden border"
         onClick={(e) => e.stopPropagation()}
       >
         {children}
@@ -86,8 +87,8 @@ const Top = () => {
           <Fragment key={i}>
             <span
               onClick={() => actionBarPanels.set(panels.slice(0, i + 1))}
-              style={{ outlineColor: col(s.textColor, 0.1) }}
-              className="cursor-pointer whitespace-nowrap rounded-md p-1 hover:outline"
+              style={{ outlineColor: col(s.textColor, 0.1), borderRadius: 6 * s.roundness }}
+              className="cursor-pointer whitespace-nowrap p-1 hover:outline"
             >
               {panel.name}
             </span>
@@ -121,6 +122,7 @@ const Middle = () => {
 };
 
 const Bottom = () => {
+  const s = useActionBarStyle();
   return (
     <div className="flex w-full items-center justify-between px-4 py-1 text-xs opacity-70">
       <p>
@@ -136,7 +138,11 @@ const Bottom = () => {
           { Icon: Enter, text: "Select" },
           { Icon: CmdK, text: "Open" },
         ].map(({ Icon, text }) => (
-          <div key={text} className="flex items-center gap-1 rounded-md p-1 duration-150">
+          <div
+            key={text}
+            style={{ borderRadius: 6 * s.roundness }}
+            className="flex items-center gap-1 p-1 duration-150"
+          >
             <Icon className="h-4 w-auto" />
             <span className="text-xs">{text}</span>
           </div>
@@ -165,30 +171,34 @@ const Section = ({ title, loading }: { title: string; loading: boolean }) => {
 export const Item = ({ item }: { item: ActionBarInternalItem }) => {
   const selectedId = useStore(actionBarSelectedId);
   const selected = selectedId === item.id;
-  const style = useActionBarStyle();
+  const s = useActionBarStyle();
   return (
     <div
       id={item.id}
       onMouseEnter={() => actionBarSelectedId.set(item.id)}
       style={{
-        background: selected ? col(style.textColor, 0.15) : undefined,
+        background: selected ? col(s.textColor, 0.15) : undefined,
         cursor: item.disabled ? "not-allowed" : "pointer",
+        borderRadius: 6 * s.roundness,
         color: item.disabled
-          ? col(style.textColor, 0.5)
+          ? col(s.textColor, 0.5)
           : selected
-            ? style.textColor
-            : col(style.textColor, 0.7),
+            ? s.textColor
+            : col(s.textColor, 0.7),
       }}
-      className="flex items-center gap-2 rounded-md p-2 text-[15px] duration-150"
+      className="flex items-center gap-2 p-2 text-[15px] duration-150"
       onClick={() => callAction(item)}
     >
-      <div className="flex h-5 w-5 items-center justify-center rounded-md">
+      <div
+        style={{ borderRadius: 6 * s.roundness }}
+        className="flex h-5 w-5 items-center justify-center"
+      >
         {item.icon || <ArrowUpRight />}
       </div>
       <span>{item.title}</span>
       <span
-        style={{ opacity: selected ? 0.6 : 0 }}
-        className="ml-auto rounded-md  p-1 text-xs duration-150"
+        style={{ opacity: selected ? 0.6 : 0, borderRadius: 6 * s.roundness }}
+        className="ml-auto p-1 text-xs duration-150"
       >
         <Enter />
       </span>

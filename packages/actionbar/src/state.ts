@@ -18,6 +18,7 @@ export const actionBarStyle = atom<ActionBarStyle>({
   maxWidth: 700,
   colorScheme: "dark",
   paddingTop: 20,
+  roundness: 1,
 });
 export const useActionBarStyle = () => useStore(actionBarStyle);
 

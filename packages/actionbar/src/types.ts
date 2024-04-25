@@ -9,6 +9,7 @@ export type ActionBarStyle = {
   maxWidth: number;
   colorScheme: "light" | "dark";
   paddingTop: number;
+  roundness: number;
 };
 
 export type ActionBarProps = { panel: ActionBarPanel; style?: Partial<ActionBarStyle> };
