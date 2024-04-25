@@ -1,4 +1,4 @@
-import { CatIcon, DogIcon, HomeIcon, SunIcon, ThermometerIcon } from "lucide-react";
+import { CatIcon, DogIcon, FlagIcon, HomeIcon, SunIcon, ThermometerIcon } from "lucide-react";
 import { ActionBar } from "./ActionBar";
 import { ActionBarPanel } from "./types";
 import { compare } from "./hooks";
@@ -18,6 +18,27 @@ const CITIES = {
   NewYork: { lat: 40.712776, lng: -74.005974, flag: "https://flagcdn.com/w40/us.png" },
 };
 
+const findCountry = async (
+  search: string,
+): Promise<{ name: { common: string }; flags: { svg: string } }[]> => {
+  try {
+    const res = await fetch(`https://restcountries.com/v3.1/name/${search}`).then((x) => x.json());
+    if (res.status === 404) {
+      return [];
+    }
+    return res;
+  } catch (e) {
+    console.log(e);
+    return [];
+  }
+};
+const getTemp = async (lat: number, lng: number, degrees: string): Promise<number> => {
+  const res = await fetch(
+    `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&hourly=temperature_2m&temperature_unit=${degrees === "Celsius" ? "celsius" : "fahrenheit"}`,
+  ).then((x) => x.json());
+  return res.hourly.temperature_2m[0];
+};
+
 const degreesPanel = (city: string): ActionBarPanel => {
   return {
     placeholder: "Show temperature in",
@@ -31,10 +52,7 @@ const degreesPanel = (city: string): ActionBarPanel => {
           icon: <p className="font-bold text-blue-500">{degrees.slice(0, 1).toUpperCase()}</p>,
           action: async () => {
             const { lat, lng } = CITIES[city as keyof typeof CITIES];
-            const res = await fetch(
-              `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&hourly=temperature_2m&temperature_unit=${degrees === "Celsius" ? "celsius" : "fahrenheit"}`,
-            ).then((x) => x.json());
-            const temp = res.hourly.temperature_2m[0];
+            const temp = await getTemp(lat, lng, degrees);
             toast(`${city} temperature is ${temp} ${degrees}`);
           },
         })),
@@ -72,7 +90,7 @@ const citiesPanel: ActionBarPanel = {
 };
 
 const PANEL: ActionBarPanel = {
-  placeholder: "What do you need?",
+  placeholder: "Search for countries",
   sections: {
     pages: {
       title: "Pages",
@@ -119,21 +137,18 @@ const PANEL: ActionBarPanel = {
       ],
     },
     search: {
-      title: "Search",
+      title: "Country search",
       type: "fetch-on-search",
-      debounce: 300,
+      debounce: 500,
       items: async (search: string) => {
-        if (search.length < 2) return [];
-        console.log("this fn should only be executed at the end");
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-        return [
-          {
-            title: `Searched for ${search}, it has ${search.length} letters`,
-            action: () => {
-              alert(search);
-            },
-          },
-        ];
+        if (!search.length)
+          return [{ title: "Start typing to search for countries", icon: <FlagIcon /> }];
+        const res = await findCountry(search);
+        return res.map((x) => ({
+          title: x.name.common,
+          action: `/${x.name.common}`,
+          icon: <img src={x.flags.svg} />,
+        }));
       },
     },
   },
