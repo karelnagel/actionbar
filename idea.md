@@ -67,7 +67,6 @@ should use something like CMD+k popup and show a list of actions. you can search
 2. External package for FE components
 3. External package for BE functions
 4. SST package for easy installation for every SST project 
-5. Have a licence so that everyone can use it, but only I can sell this
 6. More/better actions and knowledge sources
 7. Get some testers/adoptation in opensource community
 8. Improve the product with opensource feedback and contributions
