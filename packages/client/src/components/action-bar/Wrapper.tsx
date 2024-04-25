@@ -1,37 +1,38 @@
 import { CatIcon, DogIcon, FlagIcon, HomeIcon, SunIcon, ThermometerIcon } from "lucide-react";
 import { ActionBar } from "./ActionBar";
 import { ActionBarPanel } from "./types";
-import { compare } from "./hooks";
 import { MoonIcon } from "lucide-react";
 import { toast } from "sonner";
 
-const CITIES = {
-  Tallinn: { lat: 64.950031, lng: 24.12444, flag: "https://flagcdn.com/w40/ee.png" },
-  Helsinki: { lat: 60.169856, lng: 24.938379, flag: "https://flagcdn.com/w40/fi.png" },
-  Stockholm: { lat: 59.329325, lng: 18.068581, flag: "https://flagcdn.com/w40/se.png" },
-  Riga: { lat: 56.94965, lng: 24.105181, flag: "https://flagcdn.com/w40/lv.png" },
-  Warsaw: { lat: 52.237049, lng: 21.012239, flag: "https://flagcdn.com/w40/pl.png" },
-  Berlin: { lat: 52.520833, lng: 13.409722, flag: "https://flagcdn.com/w40/de.png" },
-  Paris: { lat: 48.856667, lng: 2.352222, flag: "https://flagcdn.com/w40/fr.png" },
-  Madrid: { lat: 40.416775, lng: -3.70379, flag: "https://flagcdn.com/w40/es.png" },
-  London: { lat: 51.507351, lng: -0.127621, flag: "https://flagcdn.com/w40/gb.png" },
-  NewYork: { lat: 40.712776, lng: -74.005974, flag: "https://flagcdn.com/w40/us.png" },
+type Country = {
+  name: { common: string };
+  flags: { svg: string };
+  capital: [string];
+  capitalInfo: {
+    latlng: [number, number];
+  };
 };
 
-const findCountry = async (
-  search: string,
-): Promise<{ name: { common: string }; flags: { svg: string } }[]> => {
+const findCountry = async (search: string): Promise<Country[]> => {
   try {
-    const res = await fetch(`https://restcountries.com/v3.1/name/${search}`).then((x) => x.json());
-    if (res.status === 404) {
-      return [];
-    }
-    return res;
+    const res = await fetch(`https://restcountries.com/v3.1/name/${search}`);
+    if (res.status === 404) return [];
+    return res.json();
   } catch (e) {
-    console.log(e);
     return [];
   }
 };
+
+const findCapital = async (search: string): Promise<Country[]> => {
+  try {
+    const res = await fetch(`https://restcountries.com/v3.1/capital/${search}`);
+    if (res.status === 404) return [];
+    return res.json();
+  } catch (e) {
+    return [];
+  }
+};
+
 const getTemp = async (lat: number, lng: number, degrees: string): Promise<number> => {
   const res = await fetch(
     `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&hourly=temperature_2m&temperature_unit=${degrees === "Celsius" ? "celsius" : "fahrenheit"}`,
@@ -39,7 +40,7 @@ const getTemp = async (lat: number, lng: number, degrees: string): Promise<numbe
   return res.hourly.temperature_2m[0];
 };
 
-const degreesPanel = (city: string): ActionBarPanel => {
+const degreesPanel = (city: string, lat: number, lng: number): ActionBarPanel => {
   return {
     placeholder: "Show temperature in",
     name: city,
@@ -51,7 +52,6 @@ const degreesPanel = (city: string): ActionBarPanel => {
           title: degrees,
           icon: <p className="font-bold text-blue-500">{degrees.slice(0, 1).toUpperCase()}</p>,
           action: async () => {
-            const { lat, lng } = CITIES[city as keyof typeof CITIES];
             const temp = await getTemp(lat, lng, degrees);
             toast(`${city} temperature is ${temp} ${degrees}`);
           },
@@ -62,27 +62,33 @@ const degreesPanel = (city: string): ActionBarPanel => {
 };
 
 const citiesPanel: ActionBarPanel = {
-  placeholder: "Search for city",
+  placeholder: "Search for a country or capital",
   name: "Weather",
   sections: {
-    recommended: {
-      title: "Recommended",
-      type: "static",
-      items: ["Paris", "Madrid", "NewYork"].map((city) => ({
-        title: city,
-        icon: <img src={CITIES[city as keyof typeof CITIES].flag} />,
-        panel: degreesPanel(city),
-      })),
-    },
     countries: {
       title: "Countries",
       type: "fetch-on-search",
+      debounce: 500,
       items: async (search: string) => {
-        const cities = Object.entries(CITIES).filter(([city]) => compare(city, search));
-        return cities.map(([city, { flag }]) => ({
-          title: city,
-          icon: <img src={flag} />,
-          panel: degreesPanel(city),
+        if (!search.length) return [];
+        const countries = await findCountry(search);
+        return countries.map((x) => ({
+          title: x.name.common,
+          icon: <img src={x.flags.svg} />,
+          panel: degreesPanel(x.name.common, x.capitalInfo.latlng[0], x.capitalInfo.latlng[1]),
+        }));
+      },
+    },
+    capitals: {
+      title: "Capitals",
+      type: "fetch-on-search",
+      items: async (search: string) => {
+        if (!search.length) return [];
+        const capitals = await findCapital(search);
+        return capitals.map((x) => ({
+          title: x.capital[0],
+          icon: <img src={x.flags.svg} />,
+          panel: degreesPanel(x.capital[0], x.capitalInfo.latlng[0], x.capitalInfo.latlng[1]),
         }));
       },
     },
@@ -90,7 +96,7 @@ const citiesPanel: ActionBarPanel = {
 };
 
 const PANEL: ActionBarPanel = {
-  placeholder: "Search for countries",
+  placeholder: "Search for a country or a capital",
   sections: {
     pages: {
       title: "Pages",
@@ -136,7 +142,7 @@ const PANEL: ActionBarPanel = {
         },
       ],
     },
-    search: {
+    countries: {
       title: "Country search",
       type: "fetch-on-search",
       debounce: 500,
@@ -147,6 +153,20 @@ const PANEL: ActionBarPanel = {
         return res.map((x) => ({
           title: x.name.common,
           action: `/${x.name.common}`,
+          icon: <img src={x.flags.svg} />,
+        }));
+      },
+    },
+    capitals: {
+      title: "Capitals",
+      type: "fetch-on-search",
+      items: async (search: string) => {
+        if (!search.length) return [];
+        const res = await findCapital(search);
+        console.log(res);
+        return res.map((x) => ({
+          title: x.capital[0],
+          action: `/${x.capital[0]}`,
           icon: <img src={x.flags.svg} />,
         }));
       },
