@@ -13,6 +13,7 @@
     "check": "tsc --noEmit && cd packages/client && astro check"
   },
   "dependencies": {
+    "@aws-sdk/middleware-retry": "^3.374.0",
     "@nanostores/react": "^0.7.2",
     "lucide-react": "^0.373.0",
     "nanostores": "^0.10.3",
