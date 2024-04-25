@@ -6,6 +6,7 @@ import Footer from "./Footer.astro";
 import Header from "./Header.astro";
 import { SEO } from "astro-seo";
 import { ActionBarWrapper } from "./action-bar/Wrapper";
+import { Toaster } from "sonner";
 
 type Props = {
   title: string | undefined;
@@ -33,5 +34,6 @@ const { title, description } = Astro.props;
     </div>
     <Footer />
     <ActionBarWrapper client:load />
+    <Toaster client:load />
   </body>
 </html>

@@ -3,38 +3,22 @@ import { ActionBar } from "./ActionBar";
 import { ActionBarPanel } from "./types";
 import { compare } from "./hooks";
 import { MoonIcon } from "lucide-react";
+import { toast } from "sonner";
 
-const getCountriesList = async (search: string) => {
-  return [
-    "Estonia",
-    "Finland",
-    "Sweden",
-    "Lithuania",
-    "Poland",
-    "Germany",
-    "France",
-    "Spain",
-    "UK",
-    "USA",
-  ].filter((x) => compare(x, search));
+const CITIES = {
+  Tallinn: { lat: 64.950031, lng: 24.12444, flag: "https://flagcdn.com/w40/ee.png" },
+  Helsinki: { lat: 60.169856, lng: 24.938379, flag: "https://flagcdn.com/w40/fi.png" },
+  Stockholm: { lat: 59.329325, lng: 18.068581, flag: "https://flagcdn.com/w40/se.png" },
+  Riga: { lat: 56.94965, lng: 24.105181, flag: "https://flagcdn.com/w40/lv.png" },
+  Warsaw: { lat: 52.237049, lng: 21.012239, flag: "https://flagcdn.com/w40/pl.png" },
+  Berlin: { lat: 52.520833, lng: 13.409722, flag: "https://flagcdn.com/w40/de.png" },
+  Paris: { lat: 48.856667, lng: 2.352222, flag: "https://flagcdn.com/w40/fr.png" },
+  Madrid: { lat: 40.416775, lng: -3.70379, flag: "https://flagcdn.com/w40/es.png" },
+  London: { lat: 51.507351, lng: -0.127621, flag: "https://flagcdn.com/w40/uk.png" },
+  NewYork: { lat: 40.712776, lng: -74.005974, flag: "https://flagcdn.com/w40/us.png" },
 };
 
-const getCitiesList = async (search: string) => {
-  return [
-    "Tallinn",
-    "Helsinki",
-    "Stockholm",
-    "Riga",
-    "Warsaw",
-    "Berlin",
-    "Paris",
-    "Madrid",
-    "London",
-    "New York",
-  ].filter((x) => compare(x, search));
-};
-
-const degreesPanel = (country: string, city: string): ActionBarPanel => {
+const degreesPanel = (city: string): ActionBarPanel => {
   return {
     placeholder: "Show temperature in",
     name: city,
@@ -42,10 +26,15 @@ const degreesPanel = (country: string, city: string): ActionBarPanel => {
       temp: {
         title: "Temperature",
         type: "static",
-        items: ["Celsius", "Farenhite"].map((x) => ({
-          title: x,
-          action: () => {
-            alert(`User wanted temp in ${country} ${city} in ${x}`);
+        items: ["Celsius", "Farenhite"].map((degrees) => ({
+          title: degrees,
+          action: async () => {
+            const { lat, lng } = CITIES[city as keyof typeof CITIES];
+            const res = await fetch(
+              `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&hourly=temperature_2m&temperature_unit=${degrees === "Celsius" ? "celsius" : "fahrenheit"}`,
+            ).then((x) => x.json());
+            const temp = res.hourly.temperature_2m[0];
+            toast(`${city} temperature is ${temp} ${degrees}`);
           },
         })),
       },
@@ -53,38 +42,27 @@ const degreesPanel = (country: string, city: string): ActionBarPanel => {
   };
 };
 
-const citiesPanel = (country: string): ActionBarPanel => {
-  return {
-    placeholder: "Search for city",
-    name: country,
-    sections: {
-      cities: {
-        title: "Cities",
-        type: "fetch-on-search",
-        items: async (search: string) => {
-          const cities = await getCitiesList(search);
-          return cities.map((city) => ({ title: city, panel: degreesPanel(country, city) }));
-        },
-      },
-    },
-  };
-};
-
-const countriesPanel: ActionBarPanel = {
-  placeholder: "Search for country",
+const citiesPanel: ActionBarPanel = {
+  placeholder: "Search for city",
   name: "Weather",
   sections: {
     recommended: {
       title: "Recommended",
       type: "static",
-      items: ["USA", "UK", "Estonia"].map((x) => ({ title: x, panel: citiesPanel(x) })),
+      items: ["Tallinn", "Helsinki", "New York"].map((city) => ({
+        title: city,
+        panel: degreesPanel(city),
+      })),
     },
     countries: {
       title: "Countries",
       type: "fetch-on-search",
       items: async (search: string) => {
-        const countries = await getCountriesList(search);
-        return countries.map((country) => ({ title: country, panel: citiesPanel(country) }));
+        const cities = Object.keys(CITIES).filter((x) => compare(x, search));
+        return cities.map((city) => ({
+          title: city,
+          panel: degreesPanel(city),
+        }));
       },
     },
   },
@@ -122,7 +100,7 @@ const PANEL: ActionBarPanel = {
                   ...x,
                   action: () => {
                     document.body.classList.toggle(x.title.toLowerCase());
-                    alert(`Changed theme to ${x.title}`);
+                    toast(`Changed theme to ${x.title}`);
                   },
                 })),
               },
@@ -131,7 +109,7 @@ const PANEL: ActionBarPanel = {
         },
         {
           title: "Current weather",
-          panel: countriesPanel,
+          panel: citiesPanel,
         },
       ],
     },
