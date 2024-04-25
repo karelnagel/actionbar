@@ -8,10 +8,9 @@ import {
   actionBarCurrentPanel,
 } from "./state";
 import { Loader2 } from "lucide-react";
-import { Hooks } from "./hooks";
+import { Hooks, callAction } from "./hooks";
 import { ActionBarPanel, ActionBarInternalItem } from "./types";
 import { ArrowUpRight } from "lucide-react";
-import { useCallback } from "react";
 import { actionBarSelectedId } from "./state";
 
 export type ActionBarProps = { panel: ActionBarPanel };
@@ -113,28 +112,7 @@ const Section = ({ title, loading }: { title: string; loading: boolean }) => {
 export const Item = ({ item }: { item: ActionBarInternalItem }) => {
   const selectedId = useStore(actionBarSelectedId);
   const selected = selectedId === item.id;
-
-  // Todo move to hooks
-  const action = useCallback(() => {
-    if (item.disabled) return;
-    if ("action" in item) {
-      if (typeof item.action === "string") window.location.href = item.action;
-      if (typeof item.action === "function") item.action({ search: actionBarSearch.get() });
-      actionBarOpen.set(false);
-    } else if ("panel" in item) {
-      actionBarPanels.set([...actionBarPanels.get(), item.panel]);
-      actionBarSearch.set("");
-    }
-  }, [item]);
-
-  useEffect(() => {
-    const listenToEnter = (e: any) => {
-      if (selected && actionBarOpen.get() && e.key === "Enter") action();
-    };
-    document.addEventListener("keydown", listenToEnter);
-    return () => document.removeEventListener("keydown", listenToEnter);
-  }, [selected, action]);
-
+  // Todo solve onClick
   return (
     <div
       id={item.id}
@@ -142,7 +120,7 @@ export const Item = ({ item }: { item: ActionBarInternalItem }) => {
       className={`${selected ? "bg-white/10 text-white" : "text-white/70"} ${
         item.disabled ? "cursor-not-allowed text-white/50" : "cursor-pointer"
       } flex items-center gap-2 rounded-md p-2 text-[15px] duration-150`}
-      onClick={action}
+      onClick={() => callAction(item)}
     >
       <div className="flex h-5 w-5 items-center justify-center rounded-md">
         {item.icon || <ArrowUpRight />}
@@ -151,8 +129,19 @@ export const Item = ({ item }: { item: ActionBarInternalItem }) => {
       <span
         className={`${selected ? "opacity-60" : "opacity-0"} ml-auto rounded-md  p-1 text-xs duration-150`}
       >
-        Enter
+        <Enter />
       </span>
     </div>
+  );
+};
+
+const Enter = () => {
+  return (
+    <svg fill="none" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+      <g clipRule="evenodd" fill="currentColor" fillRule="evenodd">
+        <path d="m3 14a1 1 0 0 1 1-1h12a3 3 0 0 0 3-3v-4a1 1 0 1 1 2 0v4a5 5 0 0 1 -5 5h-12a1 1 0 0 1 -1-1z" />
+        <path d="m3.293 14.707a1 1 0 0 1 0-1.414l4-4a1 1 0 0 1 1.414 1.414l-3.293 3.293 3.293 3.293a1 1 0 1 1 -1.414 1.414z" />
+      </g>
+    </svg>
   );
 };

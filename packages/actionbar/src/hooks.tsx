@@ -7,8 +7,10 @@ import {
   actionBarSelectedId,
   actionBarVisibleSections,
   actionBarCurrentPanel,
+  actionBarSelectedItem,
 } from "./state";
 import { useStore } from "@nanostores/react";
+import { ActionBarInternalItem } from "./types";
 
 const handleOpenCloseKeys = (e: any) => {
   if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
@@ -79,6 +81,32 @@ export const CheckIfSomeItemIsSelected = () => {
   return null;
 };
 
+export const callAction = (item: ActionBarInternalItem) => {
+  if (item.disabled) return;
+  if ("action" in item) {
+    if (typeof item.action === "string") window.location.href = item.action;
+    if (typeof item.action === "function") item.action({ search: actionBarSearch.get() });
+    actionBarOpen.set(false);
+  } else if ("panel" in item) {
+    actionBarPanels.set([...actionBarPanels.get(), item.panel]);
+    actionBarSearch.set("");
+  }
+};
+
+export const HandleEnter = () => {
+  const item = useStore(actionBarSelectedItem);
+
+  useEffect(() => {
+    const listenToEnter = (e: any) => {
+      if (item && actionBarOpen.get() && e.key === "Enter") callAction(item);
+    };
+    document.addEventListener("keydown", listenToEnter);
+    return () => document.removeEventListener("keydown", listenToEnter);
+  }, [item, callAction]);
+
+  return null;
+};
+
 export const compare = (a: string, b: string) => a.toLowerCase().includes(b.toLowerCase());
 
 export const FilterSections = () => {
@@ -136,6 +164,7 @@ export const Hooks = () => {
       <UpDownKeys />
       <CheckIfSomeItemIsSelected />
       <FilterSections />
+      <HandleEnter />
     </>
   );
 };

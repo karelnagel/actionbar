@@ -32,3 +32,10 @@ export const actionBarElements = computed(actionBarVisibleSections, (sections) =
 export const actionBarItems = computed(actionBarElements, (elements) => {
   return elements.filter((x) => x.type === "item").map((x) => (x.type === "item" ? x.item : null)!);
 });
+
+export const actionBarSelectedItem = computed(
+  [actionBarSelectedId, actionBarItems],
+  (selectedId, items) => {
+    return items.find((x) => x.id === selectedId);
+  },
+);
