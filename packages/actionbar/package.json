@@ -1,10 +1,12 @@
 {
   "name": "@actionbar/react",
-  "version": "0.0.5",
-  "main": "src/index.ts",
+  "version": "0.0.6",
+  "main": "dist/index.js",
   "public": true,
   "scripts": {
-    "build:css": "tailwindcss -o styles.css --minify"
+    "dev": "tsc --watch",
+    "build": "tsc && npm run build:css",
+    "build:css": "tailwindcss -o dist/styles.css --minify"
   },
   "repository": {
     "type": "git",
