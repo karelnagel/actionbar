@@ -10,7 +10,7 @@ import {
   actionBarSelectedItem,
 } from "./state";
 import { useStore } from "@nanostores/react";
-import { ActionBarInternalItem } from "./types";
+import { callAction, compare } from "./helpers";
 
 const handleOpenCloseKeys = (e: any) => {
   if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
@@ -63,7 +63,7 @@ const handleUpDown = (e: any) => {
       ?.scrollIntoView({ behavior: "smooth", block: "center", inline: "nearest" });
 };
 
-export const UpDownKeys = () => {
+const UpDownKeys = () => {
   useEffect(() => {
     document.addEventListener("keydown", handleUpDown);
     return () => document.removeEventListener("keydown", handleUpDown);
@@ -71,7 +71,7 @@ export const UpDownKeys = () => {
   return null;
 };
 
-export const CheckIfSomeItemIsSelected = () => {
+const CheckIfSomeItemIsSelected = () => {
   const selectedId = useStore(actionBarSelectedId);
   const allItems = useStore(actionBarItems);
   useEffect(() => {
@@ -81,19 +81,7 @@ export const CheckIfSomeItemIsSelected = () => {
   return null;
 };
 
-export const callAction = (item: ActionBarInternalItem) => {
-  if (item.disabled) return;
-  if ("action" in item) {
-    if (typeof item.action === "string") window.location.href = item.action;
-    if (typeof item.action === "function") item.action({ search: actionBarSearch.get() });
-    actionBarOpen.set(false);
-  } else if ("panel" in item) {
-    actionBarPanels.set([...actionBarPanels.get(), item.panel]);
-    actionBarSearch.set("");
-  }
-};
-
-export const HandleEnter = () => {
+const HandleEnter = () => {
   const item = useStore(actionBarSelectedItem);
 
   useEffect(() => {
@@ -107,9 +95,7 @@ export const HandleEnter = () => {
   return null;
 };
 
-export const compare = (a: string, b: string) => a.toLowerCase().includes(b.toLowerCase());
-
-export const FilterSections = () => {
+const FilterSections = () => {
   const panel = useStore(actionBarCurrentPanel);
   const search = useStore(actionBarSearch);
   useEffect(() => {
@@ -157,6 +143,17 @@ export const FilterSections = () => {
   return null;
 };
 
+const DisableBGScroll = () => {
+  const open = useStore(actionBarOpen);
+  useEffect(() => {
+    if (open) document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [open]);
+  return null;
+};
+
 export const Hooks = () => {
   return (
     <>
@@ -165,6 +162,7 @@ export const Hooks = () => {
       <CheckIfSomeItemIsSelected />
       <FilterSections />
       <HandleEnter />
+      <DisableBGScroll />
     </>
   );
 };

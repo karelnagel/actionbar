@@ -11,7 +11,8 @@ import {
   col,
 } from "./state";
 import { ArrowUpDown, CommandIcon, DeleteIcon, Loader2 } from "lucide-react";
-import { Hooks, callAction } from "./hooks";
+import { Hooks } from "./hooks";
+import { callAction } from "./helpers";
 import { ActionBarInternalItem, ActionBarProps } from "./types";
 import { ArrowUpRight } from "lucide-react";
 import { actionBarSelectedId } from "./state";
@@ -45,16 +46,17 @@ const Dialog = ({ children }: { children: ReactNode }) => {
   const s = useActionBarStyle();
   return (
     <div
+      id="actionbar"
       style={{
         colorScheme: s.colorScheme,
         backgroundColor: s.shadowColor,
         display: open ? "flex" : "none",
-        paddingTop: `${s.paddingTop}vh`,
       }}
-      className="fixed left-0 top-0 z-50 h-screen w-screen items-start justify-center p-4 backdrop-blur-sm duration-150"
+      className="fixed left-0 top-0 z-50 h-screen w-screen items-start justify-center pt-[10vh] backdrop-blur-sm duration-150 md:p-4 md:pt-[25vh]"
       onClick={() => actionBarOpen.set(false)}
     >
       <div
+        id="actionbar-content"
         style={{
           maxHeight: s.maxHeight,
           maxWidth: s.maxWidth,
@@ -82,7 +84,7 @@ const Top = () => {
   const s = useActionBarStyle();
   useEffect(() => inputRef.current?.focus(), [open]);
   return (
-    <div className="flex items-center gap-2 p-4 text-[18px]">
+    <div id="actionbar-top" className="flex items-center gap-2 p-4 text-[18px]">
       {panels
         .filter((panel) => panel.name)
         .map((panel, i) => (
@@ -98,6 +100,7 @@ const Top = () => {
           </Fragment>
         ))}
       <input
+        id="actionbar-input"
         ref={inputRef}
         type="text"
         className="placeholder:text-current/60 w-full bg-transparent focus:outline-none"
@@ -113,7 +116,7 @@ const Middle = () => {
   const elements = useStore(actionBarElements);
 
   return (
-    <div className="flex h-full flex-col overflow-y-auto p-3">
+    <div id="actionbar-middle" className="flex h-full flex-col overflow-y-auto p-3">
       {elements.map((e) => {
         if (e.type === "section" && e.title)
           return <Section key={e.title} title={e.title} loading={e.loading} />;
@@ -127,14 +130,17 @@ const Bottom = () => {
   const s = useActionBarStyle();
   if (s.hideBottom) return null;
   return (
-    <div className="flex w-full items-center justify-between px-4 py-1 text-xs opacity-70">
-      <p>
+    <div
+      id="actionbar-bottom"
+      className="flex w-full items-center justify-center px-4 py-1 text-xs opacity-70 md:justify-between"
+    >
+      <p className="py-1">
         Powered by{" "}
         <a className="text-blue-400" target="_blank" href="https://actionbar.asius.ai">
           ActionBar
         </a>
       </p>
-      <div className="flex items-center gap-4">
+      <div className="hidden items-center gap-4 md:flex">
         {[
           { Icon: ArrowUpDown, text: "Navigate" },
           { Icon: DeleteIcon, text: "Go back" },
@@ -175,10 +181,14 @@ export const Item = ({ item }: { item: ActionBarInternalItem }) => {
   const selectedId = useStore(actionBarSelectedId);
   const selected = selectedId === item.id;
   const s = useActionBarStyle();
+
+  const href = "action" in item && typeof item.action === "string" ? item.action : undefined;
   return (
-    <div
-      id={item.id}
-      onMouseEnter={() => actionBarSelectedId.set(item.id)}
+    <a
+      id={`actionbar-item-${item.id}`}
+      onMouseMove={() => {
+        if (!selected) actionBarSelectedId.set(item.id);
+      }}
       style={{
         background: selected ? col(s.textColor, 0.15) : undefined,
         cursor: item.disabled ? "not-allowed" : "pointer",
@@ -190,7 +200,8 @@ export const Item = ({ item }: { item: ActionBarInternalItem }) => {
             : col(s.textColor, 0.7),
       }}
       className="flex items-center gap-2 p-2 text-[15px] duration-150"
-      onClick={() => callAction(item)}
+      onClick={href ? undefined : () => callAction(item)}
+      href={href}
     >
       <div
         style={{ borderRadius: 6 * s.roundness }}
@@ -205,7 +216,7 @@ export const Item = ({ item }: { item: ActionBarInternalItem }) => {
       >
         <Enter />
       </span>
-    </div>
+    </a>
   );
 };
 
