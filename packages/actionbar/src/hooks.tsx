@@ -57,10 +57,10 @@ const handleUpDown = (e: any) => {
 
   e.preventDefault();
   actionBarSelectedId.set(id || null);
-  if (id)
-    document
-      .getElementById(id)
-      ?.scrollIntoView({ behavior: "smooth", block: "center", inline: "nearest" });
+  const elemId = `actionbar-item-${id}`;
+  document
+    .getElementById(elemId)
+    ?.scrollIntoView({ behavior: "smooth", block: "center", inline: "nearest" });
 };
 
 const UpDownKeys = () => {
