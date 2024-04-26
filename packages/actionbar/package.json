@@ -1,12 +1,26 @@
 {
   "name": "@actionbar/react",
-  "version": "0.0.6",
-  "main": "dist/index.js",
+  "version": "0.0.19",
   "public": true,
+  "type": "module",
+  "source": "src/index.ts",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.module.js",
+  "unpkg": "./dist/index.umd.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    "require": "./dist/index.cjs",
+    "default": "./dist/index.modern.js",
+    "types": "./dist/index.d.ts"
+  },
+  "files": [
+    "dist",
+    "styles.css",
+    "thisshitisnotworkingfuck"
+  ],
   "scripts": {
-    "dev": "tsc --watch",
-    "build": "tsc && npm run build:css",
-    "build:css": "tailwindcss -o dist/styles.css --minify"
+    "build:css": "tailwindcss -o styles.css --minify",
+    "build": "microbundle --no-compress --jsx React.createElement --jsxFragment React.Fragment --jsxImportSource react --globals react/jsx-runtime=jsx"
   },
   "repository": {
     "type": "git",
@@ -20,5 +34,8 @@
   },
   "publishConfig": {
     "access": "public"
+  },
+  "devDependencies": {
+    "microbundle": "^0.15.1"
   }
 }

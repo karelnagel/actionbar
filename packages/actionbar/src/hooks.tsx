@@ -90,7 +90,7 @@ const HandleEnter = () => {
     };
     document.addEventListener("keydown", listenToEnter);
     return () => document.removeEventListener("keydown", listenToEnter);
-  }, [item, callAction]);
+  }, [item]);
 
   return null;
 };
