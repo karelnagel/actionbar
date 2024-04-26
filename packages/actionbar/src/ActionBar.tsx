@@ -66,7 +66,7 @@ const Dialog = ({ children }: { children: ReactNode }) => {
           borderRadius: 16 * s.roundness,
           height: s.fullHeight ? "100%" : undefined,
         }}
-        className="flex w-full flex-col overflow-hidden border"
+        className="flex w-full flex-col overflow-hidden border border-solid"
         onClick={(e) => e.stopPropagation()}
       >
         {children}
@@ -103,7 +103,7 @@ const Top = () => {
         id="actionbar-input"
         ref={inputRef}
         type="text"
-        className="placeholder:text-current/60 w-full bg-transparent focus:outline-none"
+        className="placeholder:text-current/60 h-full w-full border-none bg-transparent text-[18px] text-inherit focus:outline-none"
         value={search}
         placeholder={panel?.placeholder}
         onChange={(e) => actionBarSearch.set(e.target.value)}
@@ -132,14 +132,14 @@ const Bottom = () => {
   return (
     <div
       id="actionbar-bottom"
-      className="flex w-full items-center justify-center px-4 py-1 text-xs opacity-70 md:justify-between"
+      className="flex items-center justify-center px-4 py-1 text-xs opacity-70 md:justify-between"
     >
-      <p className="py-1">
+      <span className="py-1">
         Powered by{" "}
-        <a className="text-blue-400" target="_blank" href="https://actionbar.asius.ai">
+        <a className="text-blue-40" target="_blank" href="https://actionbar.asius.ai">
           ActionBar
         </a>
-      </p>
+      </span>
       <div className="hidden items-center gap-4 md:flex">
         {[
           { Icon: ArrowUpDown, text: "Navigate" },
@@ -171,7 +171,7 @@ const CmdK = ({ className }: { className?: string }) => (
 const Section = ({ title, loading }: { title: string; loading: boolean }) => {
   return (
     <div className="flex items-center gap-1 py-1 text-sm opacity-60">
-      <p>{title}</p>
+      <span>{title}</span>
       {loading && <Loader2 className="h-3 w-3 animate-spin" />}
     </div>
   );
@@ -199,7 +199,7 @@ export const Item = ({ item }: { item: ActionBarInternalItem }) => {
             ? s.textColor
             : col(s.textColor, 0.7),
       }}
-      className="flex items-center gap-2 p-2 text-[15px] duration-150"
+      className="flex items-center gap-2 p-2 text-[15px] no-underline duration-150"
       onClick={href ? undefined : () => callAction(item)}
       href={href}
     >
