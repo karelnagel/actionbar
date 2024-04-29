@@ -1,5 +1,5 @@
 {
-  "id": "a2580178-4573-48b4-9b57-8350bc9d866b",
+  "id": "bf9c44db-80cc-422d-b536-3a15b0bae5ab",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "5",
   "dialect": "pg",
@@ -18,19 +18,19 @@
           "name": "url",
           "type": "text",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "title": {
           "name": "title",
           "type": "text",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "description": {
           "name": "description",
           "type": "text",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         }
       },
       "indexes": {},
@@ -52,19 +52,19 @@
           "name": "text",
           "type": "text",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "embedding": {
           "name": "embedding",
           "type": "vector(512)",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "source_id": {
           "name": "source_id",
           "type": "text",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         }
       },
       "indexes": {},

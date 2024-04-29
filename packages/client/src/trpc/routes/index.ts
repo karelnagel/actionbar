@@ -1,8 +1,8 @@
-import { contact } from "./contact";
+import { search } from "./search";
 import { router } from "../root";
 
 export const appRouter = router({
-  contact,
+  search,
 });
 
 export type AppRouter = typeof appRouter;

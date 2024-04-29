@@ -1,6 +1,9 @@
+import dotenv from "dotenv";
+dotenv.config({ path: "../../.env" });
+
 import { db } from "../db";
 import { sources, texts } from "../db/schema";
-import { findClosest, generateEmbedding } from "./embeddings";
+import { generateEmbedding } from "./embeddings";
 import { indexSite } from "./sitemap";
 import crypto from "crypto";
 
@@ -11,9 +14,13 @@ const getMd5 = (text: string) => {
   return crypto.createHash("md5").update(text).digest("hex");
 };
 
+const URL = "https://astro.build/sitemap-0.xml";
+
 export const indexWebsite = async () => {
-  const url = "https://asius.ai/sitemap.xml";
-  const sites = await indexSite(url);
+  await db.delete(sources).execute();
+  await db.delete(texts).execute();
+
+  const sites = await indexSite(URL);
   for (const site of sites) {
     const sourceId = getRandomId();
     await db.insert(sources).values({
@@ -37,12 +44,8 @@ export const indexWebsite = async () => {
     }
     console.log(site);
   }
+
+  console.log("done");
 };
 
-export const search = async (q: string) => {
-  const results = await findClosest(q);
-  console.log(results);
-};
-
-// indexWebsite();
-search("remotion");
+indexWebsite();

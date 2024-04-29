@@ -48,5 +48,5 @@ export function cosineDistance(
     column: SQLWrapper | AnyColumn,
     value: number[]
 ) {
-    return sql`${column} <=> ${toSql(value)}`;
+    return sql<number>`${column} <=> ${toSql(value)}`;
 }

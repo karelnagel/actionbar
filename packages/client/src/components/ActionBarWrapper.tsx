@@ -13,6 +13,7 @@ import { ActionBar, type ActionBarPanel, type ActionBarItem } from "../../../act
 import { MoonIcon } from "lucide-react";
 import { toast } from "sonner";
 import { findCountry, findCapital, getTemp } from "./countries";
+import { client } from "../trpc/client";
 
 const degreesPanel = (city: string, lat: number, lng: number): ActionBarPanel => ({
   placeholder: "Show temperature in",
@@ -186,6 +187,18 @@ const PANEL: ActionBarPanel = {
           title: x.capital[0],
           action: `/${x.capital[0]}`,
           icon: <img src={x.flags.svg} />,
+        }));
+      },
+    },
+    search: {
+      title: "Search",
+      type: "fetch-on-search",
+      items: async (search: string) => {
+        if (!search.length) return [];
+        const res = await client.search.search.mutate({ q: search });
+        return res.items.map((x) => ({
+          title: x.title,
+          action: x.sourceUrl,
         }));
       },
     },

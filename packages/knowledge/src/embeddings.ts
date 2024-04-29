@@ -23,13 +23,13 @@ export const findClosest = async (text: string) => {
     .select({
       text: texts.text,
       title: sources.title,
-      source: sources.url,
+      sourceUrl: sources.url,
       cosine: cosineDistance(texts.embedding, embedding),
       // l2: l2Distance(texts.embedding, embedding),
       // maxInner: maxInnerProduct(texts.embedding, embedding),
     })
     .from(texts)
-    .leftJoin(sources, eq(sources.id, texts.sourceId))
+    .innerJoin(sources, eq(sources.id, texts.sourceId))
     .orderBy(asc(cosineDistance(texts.embedding, embedding)))
     .limit(5)
     .execute();
