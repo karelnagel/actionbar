@@ -19,8 +19,8 @@ export const getPage = async (url: string) => {
   const description = $("meta[name=description]").attr("content") || "";
   const text = $("body").text();
   const splitter = new RecursiveCharacterTextSplitter({
-    chunkSize: 175,
-    chunkOverlap: 20,
+    chunkSize: 512,
+    chunkOverlap: 40,
   });
   const output = await splitter.createDocuments([text]);
   return {
