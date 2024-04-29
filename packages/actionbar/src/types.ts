@@ -40,6 +40,7 @@ type ActionArgs = { search: string };
 export type ActionBarItem = {
   id?: string;
   title: string;
+  description?: string;
   icon?: ReactNode;
   matchAll?: boolean;
   disabled?: boolean;

@@ -209,7 +209,12 @@ export const Item = ({ item }: { item: ActionBarInternalItem }) => {
       >
         {item.icon || <ArrowUpRight />}
       </div>
-      <span>{item.title}</span>
+      <div className="flex flex-col justify-start">
+        <span>{item.title}</span>
+        {item.description && (
+          <span className="line-clamp-1 text-xs opacity-70">{item.description}</span>
+        )}
+      </div>
       <span
         style={{ opacity: selected ? 0.6 : 0, borderRadius: 6 * s.roundness }}
         className="ml-auto p-1 text-xs duration-150"

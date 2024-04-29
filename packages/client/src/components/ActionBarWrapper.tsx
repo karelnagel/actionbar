@@ -199,6 +199,7 @@ const PANEL: ActionBarPanel = {
         return res.items.map((x) => ({
           title: x.title,
           action: x.sourceUrl,
+          description: x.text,
         }));
       },
     },
