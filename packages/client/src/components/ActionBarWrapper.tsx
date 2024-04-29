@@ -9,7 +9,7 @@ import {
   ThermometerIcon,
   XIcon,
 } from "lucide-react";
-import { ActionBar, type ActionBarPanel, ActionBarItem } from "@actionbar/react";
+import { ActionBar, type ActionBarPanel, type ActionBarItem } from "../../../actionbar/src/index";
 import { MoonIcon } from "lucide-react";
 import { toast } from "sonner";
 import { findCountry, findCapital, getTemp } from "./countries";
