@@ -13,14 +13,7 @@ export const getPagesFromSitemap = async (url: string): Promise<string[]> => {
   return sites;
 };
 
-export const getPage = async (href: string) => {
-  const url = new URL(href);
-  const res = await fetch(url).then((res) => res.text());
-  const $ = cheerio.load(res);
-  $("script").remove();
-  const title = $("title").text() || "";
-  const description = $("meta[name=description]").attr("content") || "";
-  const html = $("body").html() || "";
+const htmlToMd = (html: string, url: URL) => {
   const converter = new TurndownService({
     headingStyle: "atx",
     fence: "```",
@@ -34,12 +27,28 @@ export const getPage = async (href: string) => {
       return res;
     },
   });
-  const markdown = converter.turndown(html);
-  const splitter = new RecursiveCharacterTextSplitter({
-    chunkSize: 512,
-    chunkOverlap: 40,
-  });
-  const output = await splitter.createDocuments([markdown]);
+  return converter.turndown(html);
+};
+
+const splitText = async (text: string) => {
+  const splitter = new RecursiveCharacterTextSplitter({ chunkSize: 512, chunkOverlap: 40 });
+  return await splitter.createDocuments([text]);
+};
+
+export const getPage = async (href: string) => {
+  const url = new URL(href);
+  const res = await fetch(url).then((res) => res.text());
+  const $ = cheerio.load(res);
+  $("script").remove();
+  $("style").remove();
+  $("link").remove();
+  $("meta").remove();
+  $("iframe").remove();
+  $("noscript").remove();
+  const title = $("title").text() || "";
+  const description = $("meta[name=description]").attr("content") || "";
+  const markdown = htmlToMd($("body").html() || "", url);
+  const output = await splitText(markdown);
   return {
     markdown,
     texts: output.map((doc) => doc.pageContent),
@@ -59,11 +68,14 @@ export const indexSite = async (url: string) => {
   return indexed;
 };
 
-fs.mkdirSync("out", { recursive: true });
-getPage("https://wolfagency.ee/").then((x) => fs.writeFileSync("out/wolfagency.md", x.markdown));
-getPage("https://asius.ai").then((x) => fs.writeFileSync("out/asius.md", x.markdown));
-getPage("https://astro.build").then((x) => fs.writeFileSync("out/astro.md", x.markdown));
-getPage("https://ion.sst.dev/docs/component/aws/astro/").then((x) =>
-  fs.writeFileSync("out/ion.md", x.markdown),
+const path = "out";
+fs.mkdirSync(path, { recursive: true });
+getPage("https://wolfagency.ee/").then((x) =>
+  fs.writeFileSync(`${path}/wolfagency.md`, x.markdown),
 );
-getPage("https://www.framer.com/").then((x) => fs.writeFileSync("out/framer.md", x.markdown));
+getPage("https://asius.ai").then((x) => fs.writeFileSync(`${path}/asius.md`, x.markdown));
+getPage("https://astro.build").then((x) => fs.writeFileSync(`${path}/astro.md`, x.markdown));
+getPage("https://ion.sst.dev/docs/component/aws/astro/").then((x) =>
+  fs.writeFileSync(`${path}/ion.md`, x.markdown),
+);
+getPage("https://www.framer.com/").then((x) => fs.writeFileSync(`${path}/framer.md`, x.markdown));
