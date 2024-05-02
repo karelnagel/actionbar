@@ -67,7 +67,7 @@ export const actionBarSelectedItem = computed(
 
 export const actionBarAIOpen = atom(true);
 export const Message = z.object({
-  role: z.enum(["user", "assistant"]),
+  role: z.enum(["user", "assistant", "system"]),
   content: z.string(),
 });
 export type Message = z.infer<typeof Message>;

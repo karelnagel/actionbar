@@ -30,21 +30,17 @@ export const generateLocalEmbedding = async (text: string) => {
   return numbers;
 };
 
-export const findClosest = async (text: string) => {
+export const findClosest = async (text: string, limit: number = 5) => {
   const embedding = await generateLocalEmbedding(text);
   const res = await db
     .select({
       text: texts.text,
-      title: sources.title,
-      sourceUrl: sources.url,
+      sourceUrl: texts.sourceUrl,
       cosine: cosineDistance(texts.embedding, embedding),
-      // l2: l2Distance(texts.embedding, embedding),
-      // maxInner: maxInnerProduct(texts.embedding, embedding),
     })
     .from(texts)
-    .innerJoin(sources, eq(sources.url, texts.sourceUrl))
     .orderBy(asc(cosineDistance(texts.embedding, embedding)))
-    .limit(5)
+    .limit(limit)
     .execute();
   return res;
 };
