@@ -1,7 +1,7 @@
-import { RecursiveCharacterTextSplitter, MarkdownTextSplitter } from "langchain/text_splitter";
-import * as cheerio from "cheerio";
+import { MarkdownTextSplitter } from "langchain/text_splitter";
 import fs from "fs";
-import TurndownService from "turndown";
+import { htmlToMD } from "./html-to-md";
+import { browser, getPageWithPuppeteer } from "./get-html";
 
 export const getPagesFromSitemap = async (url: string): Promise<string[]> => {
   const res = await fetch(url);
@@ -11,59 +11,6 @@ export const getPagesFromSitemap = async (url: string): Promise<string[]> => {
     .map((site) => site.split("</loc>")[0]!.trim())
     .slice(1);
   return sites;
-};
-
-const fixUrl = (url: string, pageUrl: URL) => {
-  url = url.replaceAll(" ", "%20");
-  if (url.startsWith("/")) return pageUrl.origin + url;
-  return url;
-};
-const htmlToMd = (html: string, url: URL) => {
-  const converter = new TurndownService({
-    headingStyle: "atx",
-    fence: "```",
-    linkStyle: "inlined",
-    codeBlockStyle: "fenced",
-  });
-  converter.addRule("a", {
-    filter: ["a"],
-    replacement: (content, node) => {
-      const href = fixUrl((node as unknown as { href: string }).href, url);
-      if (!href) return content;
-      content = content
-        .split("\n")
-        .filter((x) => x.trim())
-        .join("\n\n");
-      // One-line children that aren't headings or images
-      if (!content.includes("\n") && !content.startsWith("#") && !content.startsWith("!"))
-        return `[${content}](${href})`;
-      return `\n\n${content}\n[LINK](${href})\n\n`;
-    },
-  });
-  converter.addRule("video", {
-    filter: ["video", "audio", "img"],
-    replacement: (content, node) => {
-      const src = (node as unknown as { src: string }).src;
-      if (!src) return content;
-      return `![${content}](${fixUrl(src, url)})`;
-    },
-  });
-  converter.addRule("footerheader", {
-    filter: ["footer", "header", "nav", "aside", "section", "article", "main"],
-    replacement: (content, node) => {
-      const tag = (node as unknown as { tagName: string }).tagName.toLowerCase();
-      content = content
-        .split("\n")
-        .filter((x) => x.trim())
-        .join("\n\n");
-      return `\n\n<${tag}>\n\n${content}\n\n</${tag}>\n\n`;
-    },
-  });
-  converter.addRule("hide", {
-    filter: ["script", "style", "link", "meta", "iframe", "noscript"],
-    replacement: () => "",
-  });
-  return converter.turndown(html);
 };
 
 const splitText = async (text: string) => {
@@ -76,12 +23,8 @@ const splitText = async (text: string) => {
 
 export const getPage = async (href: string) => {
   const url = new URL(href);
-  const res = await fetch(url);
-  const text = await res.text();
-  const $ = cheerio.load(text);
-  const title = $("title").text() || "";
-  const description = $("meta[name=description]").attr("content") || "";
-  const markdown = htmlToMd($("body").html() || "", url);
+  const { html, title, description } = await getPageWithPuppeteer(url);
+  const markdown = htmlToMD(html, url);
   const output = await splitText(markdown);
   return {
     markdown,
@@ -102,22 +45,26 @@ export const indexSite = async (url: string) => {
   return indexed;
 };
 
-const path = "out";
-fs.mkdirSync(path, { recursive: true });
-const pages = [
-  "https://asius.ai",
-  "https://wolfagency.ee/",
-  "https://astro.build",
-  "https://ion.sst.dev/docs/component/aws/astro/",
-  "https://framer.com/",
-  "https://www.err.ee/",
-];
-for (const page of pages) {
-  getPage(page).then((x) => {
-    fs.writeFileSync(`${path}/${page.split("/")[2]}.md`, x.markdown);
-    fs.writeFileSync(
-      `${path}/${page.split("/")[2]}-split.md`,
-      x.texts.join("\n\n-----SPLIT-----\n\n"),
-    );
-  });
-}
+const test = async () => {
+  const pages = [
+    "https://asius.ai",
+    "https://wolfagency.ee/",
+    "https://astro.build",
+    "https://ion.sst.dev/docs/component/aws/astro/",
+    "https://framer.com/",
+    "https://www.err.ee/",
+  ];
+  const path = "out";
+  fs.mkdirSync(path, { recursive: true });
+
+  for (const page of pages) {
+    const res = await getPage(page);
+    const name = page.split("/")[2];
+    fs.writeFileSync(`${path}/${name}.md`, res.markdown);
+    fs.writeFileSync(`${path}/${name}-split.md`, res.texts.join("\n\n-----SPLIT-----\n\n"));
+    console.log(`${name} done`);
+  }
+  browser?.close();
+};
+
+test();
