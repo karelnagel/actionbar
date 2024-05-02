@@ -1,5 +1,5 @@
 {
-  "id": "bf9c44db-80cc-422d-b536-3a15b0bae5ab",
+  "id": "4e8cdefc-7e48-4b3e-a223-7cd5785c6553",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "5",
   "dialect": "pg",
@@ -8,14 +8,14 @@
       "name": "sources",
       "schema": "",
       "columns": {
-        "id": {
-          "name": "id",
+        "url": {
+          "name": "url",
           "type": "text",
           "primaryKey": true,
           "notNull": true
         },
-        "url": {
-          "name": "url",
+        "hash": {
+          "name": "hash",
           "type": "text",
           "primaryKey": false,
           "notNull": true
@@ -31,6 +31,12 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
         }
       },
       "indexes": {},
@@ -42,8 +48,8 @@
       "name": "texts",
       "schema": "",
       "columns": {
-        "hash": {
-          "name": "hash",
+        "id": {
+          "name": "id",
           "type": "text",
           "primaryKey": true,
           "notNull": true
@@ -60,8 +66,8 @@
           "primaryKey": false,
           "notNull": true
         },
-        "source_id": {
-          "name": "source_id",
+        "source_url": {
+          "name": "source_url",
           "type": "text",
           "primaryKey": false,
           "notNull": true

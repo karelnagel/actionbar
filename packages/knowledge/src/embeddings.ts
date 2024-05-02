@@ -17,7 +17,7 @@ export const generateOpenAIEmbeddings = async (text: string) => {
   return embedding.data[0]!.embedding;
 };
 
-export const generateTransformerEmbedding = async (text: string) => {
+export const generateLocalEmbedding = async (text: string) => {
   const extractor = await pipeline("feature-extraction", "Xenova/jina-embeddings-v2-small-en", {
     quantized: false,
   });
@@ -30,12 +30,8 @@ export const generateTransformerEmbedding = async (text: string) => {
   return numbers;
 };
 
-export const generateEmbedding = async (text: string) => {
-  return await generateTransformerEmbedding(text);
-};
-
 export const findClosest = async (text: string) => {
-  const embedding = await generateEmbedding(text);
+  const embedding = await generateLocalEmbedding(text);
   const res = await db
     .select({
       text: texts.text,
@@ -46,7 +42,7 @@ export const findClosest = async (text: string) => {
       // maxInner: maxInnerProduct(texts.embedding, embedding),
     })
     .from(texts)
-    .innerJoin(sources, eq(sources.id, texts.sourceId))
+    .innerJoin(sources, eq(sources.url, texts.sourceUrl))
     .orderBy(asc(cosineDistance(texts.embedding, embedding)))
     .limit(5)
     .execute();

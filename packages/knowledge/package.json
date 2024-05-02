@@ -4,7 +4,6 @@
     "main": "src/index.ts",
     "private": true,
     "scripts": {
-        "start": "tsx src/index.ts",
         "new-migration": "drizzle-kit generate:pg",
         "migrate": "tsx db/migrate.ts",
         "studio": "drizzle-kit studio",

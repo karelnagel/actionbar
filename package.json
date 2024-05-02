@@ -9,6 +9,7 @@
   "scripts": {
     "format": "prettier --write .",
     "dev": "cd packages/client && npm run dev",
+    "index": "cd packages/knowledge && npm run index",
     "build": "cd packages/client && npm run build",
     "check": "tsc --noEmit && cd packages/client && astro check"
   },

@@ -193,6 +193,7 @@ const PANEL: ActionBarPanel = {
     search: {
       title: "Search",
       type: "fetch-on-search",
+      debounce: 500,
       items: async (search: string) => {
         if (!search.length) return [];
         const res = await client.search.search.mutate({ q: search });

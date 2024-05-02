@@ -3,14 +3,13 @@ import fs from "fs";
 import { htmlToMD } from "./html-to-md";
 import { browser, getPageWithPuppeteer } from "./get-html";
 
-export const getPagesFromSitemap = async (url: string): Promise<string[]> => {
-  const res = await fetch(url);
-  const map = await res.text();
-  const sites = map
-    .split("<loc>")
-    .map((site) => site.split("</loc>")[0]!.trim())
-    .slice(1);
-  return sites;
+export type Page = {
+  url: string;
+  title: string;
+  description: string;
+  texts: string[];
+  markdown: string;
+  status: number;
 };
 
 const splitText = async (text: string) => {
@@ -21,31 +20,20 @@ const splitText = async (text: string) => {
   return await splitter.createDocuments([text]);
 };
 
-export const getPage = async (href: string) => {
+export const getPage = async (href: string): Promise<Page> => {
   const url = new URL(href);
-  const { html, title, description } = await getPageWithPuppeteer(url);
+  const { html, ...props } = await getPageWithPuppeteer(url);
   const markdown = htmlToMD(html, url);
   const output = await splitText(markdown);
   return {
+    ...props,
     markdown,
+    url: href,
     texts: output.map((doc) => doc.pageContent),
-    title,
-    description,
   };
 };
 
-export const indexSite = async (url: string) => {
-  const sites = await getPagesFromSitemap(url);
-  console.log(sites);
-  const indexed: { url: string; title: string; description: string; texts: string[] }[] = [];
-  for (const site of sites) {
-    const content = await getPage(site);
-    indexed.push({ url: site, ...content });
-  }
-  return indexed;
-};
-
-const test = async () => {
+export const test = async () => {
   const pages = [
     "https://asius.ai",
     "https://wolfagency.ee/",
@@ -67,4 +55,4 @@ const test = async () => {
   browser?.close();
 };
 
-test();
+// test();
