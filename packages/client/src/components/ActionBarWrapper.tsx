@@ -5,11 +5,18 @@ import {
   FlagIcon,
   HomeIcon,
   MailIcon,
+  Sparkles,
   SunIcon,
   ThermometerIcon,
   XIcon,
 } from "lucide-react";
-import { ActionBar, type ActionBarPanel, type ActionBarItem } from "../../../actionbar/src/index";
+import {
+  ActionBar,
+  type ActionBarPanel,
+  type ActionBarItem,
+  actionBarAIOpen,
+  actionBarAIMessages,
+} from "../../../actionbar/src/index";
 import { MoonIcon } from "lucide-react";
 import { toast } from "sonner";
 import { findCountry, findCapital, getTemp } from "./countries";
@@ -202,6 +209,25 @@ const PANEL: ActionBarPanel = {
           action: x.sourceUrl,
           description: x.text,
         }));
+      },
+    },
+    ai: {
+      type: "fetch-on-search",
+      items: async (search: string) => {
+        const isValid = search.length > 0;
+        return [
+          {
+            title: isValid ? `Ask AI: '${search}'` : "Open AI Chat",
+            icon: <Sparkles />,
+            action: () => {
+              actionBarAIOpen.set(true);
+              actionBarAIMessages.set([
+                ...actionBarAIMessages.get(),
+                { role: "user", content: search },
+              ]);
+            },
+          },
+        ];
       },
     },
   },

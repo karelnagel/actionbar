@@ -6,6 +6,8 @@ import {
   ActionBarStyle,
 } from "./types";
 import { useStore } from "@nanostores/react";
+import { z } from "zod";
+import axios from "axios";
 
 export const col = (hex: string, opacity: number) => hex + Math.round(opacity * 255).toString(16);
 
@@ -62,3 +64,29 @@ export const actionBarSelectedItem = computed(
     return items.find((x) => x.id === selectedId);
   },
 );
+
+export const actionBarAIOpen = atom(true);
+export const Message = z.object({
+  role: z.enum(["user", "assistant"]),
+  content: z.string(),
+});
+export type Message = z.infer<typeof Message>;
+
+export const actionBarAIMessages = atom<Message[]>([
+  { role: "assistant", content: "Hi! How can I help you?" },
+]);
+
+export const actionBarAIInput = atom("");
+
+actionBarAIMessages.listen(async (messages, oldValue) => {
+  const messageId = messages.length;
+  if (oldValue.length === messages.length || messages[messageId - 1]?.role !== "user") return;
+
+  actionBarAIMessages.set([...messages, { role: "assistant", content: "Loading..." }]);
+
+  const res = await axios.post("/api/chat", { messages });
+
+  actionBarAIMessages.set(
+    actionBarAIMessages.get().map((x, i) => (i === messageId ? Message.parse(res.data) : x)),
+  );
+});

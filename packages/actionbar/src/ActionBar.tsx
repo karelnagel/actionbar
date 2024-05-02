@@ -16,6 +16,7 @@ import { callAction } from "./helpers";
 import { ActionBarInternalItem, ActionBarProps } from "./types";
 import { ArrowUpRight } from "lucide-react";
 import { actionBarSelectedId } from "./state";
+import { Chat } from "./Chat";
 
 export const ActionBar = ({ panel, style }: ActionBarProps) => {
   useEffect(() => {
@@ -25,6 +26,7 @@ export const ActionBar = ({ panel, style }: ActionBarProps) => {
   return (
     <>
       <Hooks />
+      <Chat />
       <Dialog>
         <Top />
         <Divider />
